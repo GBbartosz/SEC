@@ -23,13 +23,15 @@ def get_quarter(x):
 
 
 pandas_df_display_options()
-
+main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
 
 headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
 tickers = requests.get('https://www.sec.gov/files/company_tickers.json', headers=headers).json()
 tickers_df = pd.DataFrame(tickers).transpose()
 tickers_df['cik_str'] = tickers_df['cik_str'].astype(str).str.zfill(10)
+# tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
 
+tickers_df = tickers_df[tickers_df['ticker'] == 'NVDA']
 for i in tickers_df.index[[0]]:
     cik = tickers_df['cik_str'][i]
     ticker = tickers_df['ticker'][i]
@@ -48,7 +50,7 @@ for i in tickers_df.index[[0]]:
     print()
     print(facts['facts']['us-gaap']['NetIncomeLoss'])
     print(facts['facts']['dei']['EntityCommonStockSharesOutstanding'])
-    print(facts['facts']['dei']['EntityListingParValuePerShare'])
+    #print(facts['facts']['dei']['EntityListingParValuePerShare'])
     print()
     print(facts['facts']['us-gaap']['NetIncomeLoss'].keys())
     print(facts['facts']['us-gaap']['NetIncomeLoss']['units'])
@@ -64,6 +66,7 @@ for i in tickers_df.index[[0]]:
     df = df.dropna(subset='frame')
     df['year'] = df['end'].dt.year
     df['quarter'] = df['frame'].apply(get_quarter)
+    print(df)
     df = df.drop(['accn', 'fy', 'fp', 'form', 'filed', 'frame'], axis=1)
 
     years = sorted(df['year'].unique())
@@ -77,7 +80,9 @@ for i in tickers_df.index[[0]]:
     for year in years:
         ydf = df[df['year'] == year]
         if all(q in ydf['quarter'].values for q in ['Q1', 'Q2', 'Q3', 'Q4']) is False:
-            indexes_to_update.append(ydf[ydf['quarter'].isna()].index[0])
+            ind = ydf[ydf['quarter'].isna()].index[0]
+            if ind >= 3:  # nie mozna odjac poprzednich kwartalow
+                indexes_to_update.append(ind)
 
     for i in indexes_to_update:
         start = df.iloc[i - 1]['end'] + datetime.timedelta(days=1)
