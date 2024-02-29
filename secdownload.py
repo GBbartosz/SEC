@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import datetime
 
+
 from matplotlib import pyplot as plt
 
 # class with parameters for each indicator
@@ -11,14 +12,15 @@ from matplotlib import pyplot as plt
 
 class Indicators:
     def __init__(self):
-        self.summarizing_indicators = ['Revenues', 'NetIncomeLoss']
-        self.not_summarizing_indicators = ['WeightedAverageNumberOfDilutedSharesOutstanding']
+        self.summarizing_indicators = ['Revenues', 'SalesRevenueNet', 'NetIncomeLoss']
+        self.not_summarizing_indicators = []
 
         self.units_dict = {'Revenues': 'USD',
-                           'NetIncomeLoss': 'USD',
-                           'WeightedAverageNumberOfDilutedSharesOutstanding': 'shares'}
+                           'SalesRevenueNet': 'USD',
+                           'NetIncomeLoss': 'USD'}
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
+        self.valid_indicators = []
 
 
 class IndicatorType:
@@ -34,20 +36,12 @@ class IndicatorType:
         self.units = self.indicators.units_dict[self.name]
 
 
-def pandas_df_display_options():
-    pd.reset_option('display.max_rows')
-    pd.reset_option('display.max_columns')
-    pd.reset_option('display.width')
-    pd.reset_option('display.float_format')
-    pd.reset_option('display.max_colwidth')
-
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_colwidth', 40)
-    pd.set_option('display.width', 400)
+def print_metric_information(myind_class, myfacts, n):
+    if n == 0:
+        print(myfacts['facts']['us-gaap'][myind_class.name])
 
 
-def get_df(myfacts, myind_class):
+def get_df(myfacts, myind_class, myindicators):
 
     def get_quarter(x):
         return x[-2:] if pd.isna(x) is False and 'Q' in x else None
@@ -62,10 +56,14 @@ def get_df(myfacts, myind_class):
         mydf2 = mydf2.reset_index(drop=True)
         return mydf2, myyears2, myfirst_year
 
-    mydf = pd.DataFrame(myfacts['facts']['us-gaap'][myind_class.name]['units'][myind_class.units])
+    try:
+        mydf = pd.DataFrame(myfacts['facts']['us-gaap'][myind_class.name]['units'][myind_class.units])
+        myindicators.valid_indicators.append(myind_class.name)
+    except KeyError:
+        mydf = None
+        myyears = None
+        return mydf, myyears
     mydf = mydf.rename(columns={'val': myind_class.name})
-    print(mydf)
-    #mydf['start'] = pd.to_datetime(mydf['start'])
     mydf['end'] = pd.to_datetime(mydf['end'])
     mydf = mydf.dropna(subset='frame')  # drop rows with null in frame
     mydf['year'] = mydf['end'].dt.year
@@ -96,13 +94,13 @@ def convert_full_years_data_to_quarter_data(mydf, myindexes_to_update, myindclas
         filed = mydf.iloc[i]['filed']
 
         if myindclass.summarizing:
-            year_value = mydf.iloc[i][indicator]
-            prev_q1 = mydf.iloc[i - 1][indicator]
-            prev_q2 = mydf.iloc[i - 2][indicator]
-            prev_q3 = mydf.iloc[i - 3][indicator]
+            year_value = mydf.iloc[i][myindclass.name]
+            prev_q1 = mydf.iloc[i - 1][myindclass.name]
+            prev_q2 = mydf.iloc[i - 2][myindclass.name]
+            prev_q3 = mydf.iloc[i - 3][myindclass.name]
             val = year_value - prev_q1 - prev_q2 - prev_q3
         else:
-            val = df.iloc[i][indicator]
+            val = mydf.iloc[i][myindclass.name]
 
         year = mydf.iloc[i]['year']
         prev_q = mydf.iloc[i - 1]['quarter']
@@ -113,29 +111,17 @@ def convert_full_years_data_to_quarter_data(mydf, myindexes_to_update, myindclas
     return mydf
 
 
-pandas_df_display_options()
-main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
-tickers_df = download_tickers_df(headers)
-# tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
-
-tickers_df = tickers_df[tickers_df['ticker'] == 'NVDA']
-for i in tickers_df.index[[0]]:
-    cik = tickers_df['cik_str'][i]
-    ticker = tickers_df['ticker'][i]
-    company_name = tickers_df['title'][i]
-    print(f'{ticker}: {cik}')
+def download_metrics(ticker, cik, main_folder_path, headers, n):
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
-    print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
-    #base_columns = ['start', 'end', 'filed', 'year', 'quarter']
     base_columns = ['end', 'filed', 'year', 'quarter']
     indicators = Indicators()
     total_df = None
-    #for indicator in indicators.indicators:
-    for indicator in ['WeightedAverageNumberOfDilutedSharesOutstanding']:
+    for indicator in indicators.indicators:
         ind_class = IndicatorType(indicator)
-        df, years = get_df(facts, ind_class)
-        print(df)
+        df, years = get_df(facts, ind_class, indicators)
+        if df is None:  # case when ticker doesn't have this indicator
+            continue
+        print_metric_information(ind_class, facts, n)
         indexes_to_update = find_indexes_with_full_year_data(df, years)
         df = convert_full_years_data_to_quarter_data(df, indexes_to_update, ind_class)
         df = df.sort_values(by=['end']).dropna().reset_index(drop=True).reindex(columns=base_columns + [ind_class.name])
@@ -143,10 +129,9 @@ for i in tickers_df.index[[0]]:
         if total_df is None:
             total_df = df
         else:
-            #total_df = pd.merge(total_df, df, on=['start', 'end', 'filed', 'year', 'quarter'])
             total_df = pd.merge(total_df, df, on=['end', 'filed', 'year', 'quarter'])
 
-    print(total_df.tail(10))
-    total_df.to_csv(f'{main_folder_path}metrics\\{ticker}_metrics.csv')
+    print(indicators.valid_indicators)
+    total_df[indicators.valid_indicators] = total_df[indicators.valid_indicators] / 1000000
 
-
+    total_df.to_csv(f'{main_folder_path}metrics\\{ticker}_metrics.csv', index=False)

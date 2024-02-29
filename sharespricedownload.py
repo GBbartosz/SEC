@@ -4,8 +4,6 @@ import pandas as pd
 import datetime
 from matplotlib import pyplot as plt
 
-import functions
-
 
 def pandas_df_display_options():
     pd.reset_option('display.max_rows')
@@ -29,29 +27,27 @@ def correct_errors(df, tic):
     return df
 
 
-pandas_df_display_options()
-main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
-tickers_df = functions.download_tickers_df(headers)
-
-tickers_df = tickers_df[tickers_df['ticker'] == 'NVDA']
-for i in tickers_df.index[[0]]:
-    cik = tickers_df['cik_str'][i]
-    ticker = tickers_df['ticker'][i]
-    company_name = tickers_df['title'][i]
+def download_price_and_shares(ticker, cik, main_folder_path, headers):
+    share_types = ['WeightedAverageNumberOfDilutedSharesOutstanding', 'CommonStockSharesOutstanding']
+    n = 0
     print(f'{ticker}: {cik}')
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
     print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
-    sharedf = pd.DataFrame(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding']['units']['shares'])
+
+    try:
+        share_type = share_types[0]
+        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
+    except KeyError:  # gdy WeightedAverageNumberOfDilutedSharesOutstanding nei wystepuje ddla tickera
+        share_type = share_types[1]
+        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
+
     sharedf = sharedf.dropna(subset='frame')
     sharedf['end'] = pd.to_datetime(sharedf['end'])
     sharedf['filed'] = pd.to_datetime(sharedf['filed'])
     sharedf = sharedf.sort_values(by='filed').reset_index(drop=True)
-    #print(sharedf)
     min_date = sharedf['filed'].min()
 
-
-# Download shares outstanding data
+    # Download shares outstanding data
     stock_info = yf.Ticker(ticker)
     pricedf = stock_info.history(period='1d', start=min_date, end=datetime.date.today())
     pricedf = pricedf.reset_index()
@@ -60,31 +56,17 @@ for i in tickers_df.index[[0]]:
     pricedf['date'] = pd.to_datetime(pricedf['date'])
     pricedf['date'] = pricedf['date'].dt.date
     pricedf['date'] = pd.to_datetime(pricedf['date'])
-    #print(pricedf.head(10))
-    #print(pricedf.tail(10))
     stock_split_df = pricedf[pricedf['stock_splits'] > 0][['date', 'stock_splits']]
-    #print(stock_split_df)
 
     sharedf = pd.merge_asof(sharedf, stock_split_df, left_on='filed', right_on='date', direction='forward')
 
-    sharedf['stock_splits'] = sharedf['stock_splits'].fillna(method='bfill')
+    sharedf['stock_splits'] = sharedf['stock_splits'].bfill()
     sharedf['shares'] = sharedf.apply(lambda x: x['val'] if pd.isna(x['stock_splits']) else x['val'] * x['stock_splits'], axis=1)
     sharedf['shares'] = sharedf['shares'] / 1000000
     sharedf = sharedf.sort_values(by='end')
-    print(sharedf.head())
     sharedf = correct_errors(sharedf, ticker)
+    sharedf = sharedf.rename(columns={'val': 'WeightedAverageNumberOfDilutedSharesOutstanding'})
+    sharedf = sharedf.drop(['start', 'accn', 'fy', 'fp', 'form', 'frame', 'date'], axis=1)
 
-    print(sharedf)
-
-
-
-#tickerDf['Date'] = tickerDf['Date'].dt.date
-#print(tickerDf)
-#
-fig, ax = plt.subplots()
-#
-ax.plot(sharedf['end'], sharedf['shares'])
-plt.show()
-
-# 45  2020-01-27 2020-04-26                                622000000         2021-05-26  2021      Q1
-# 46  2020-04-27 2020-07-26                               2504000000         2021-08-20  2021      Q2
+    pricedf.to_csv(f'{main_folder_path}metrics\\{ticker}_price.csv', index=False)
+    sharedf.to_csv(f'{main_folder_path}metrics\\{ticker}_shares.csv', index=False)
