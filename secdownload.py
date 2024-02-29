@@ -12,11 +12,11 @@ from matplotlib import pyplot as plt
 class Indicators:
     def __init__(self):
         self.summarizing_indicators = ['Revenues', 'NetIncomeLoss']
-        self.not_summarizing_indicators = ['CommonStockSharesOutstanding']
+        self.not_summarizing_indicators = ['WeightedAverageNumberOfDilutedSharesOutstanding']
 
         self.units_dict = {'Revenues': 'USD',
                            'NetIncomeLoss': 'USD',
-                           'CommonStockSharesOutstanding': 'shares'}
+                           'WeightedAverageNumberOfDilutedSharesOutstanding': 'shares'}
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
 
@@ -45,15 +45,6 @@ def pandas_df_display_options():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', 40)
     pd.set_option('display.width', 400)
-
-
-def download_tickers_df():
-    global headers
-
-    mytickers = requests.get('https://www.sec.gov/files/company_tickers.json', headers=headers).json()
-    mytickers_df = pd.DataFrame(mytickers).transpose()
-    mytickers_df['cik_str'] = mytickers_df['cik_str'].astype(str).str.zfill(10)
-    return mytickers_df
 
 
 def get_df(myfacts, myind_class):
@@ -125,7 +116,7 @@ def convert_full_years_data_to_quarter_data(mydf, myindexes_to_update, myindclas
 pandas_df_display_options()
 main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
 headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
-tickers_df = download_tickers_df()
+tickers_df = download_tickers_df(headers)
 # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
 
 tickers_df = tickers_df[tickers_df['ticker'] == 'NVDA']
@@ -135,12 +126,13 @@ for i in tickers_df.index[[0]]:
     company_name = tickers_df['title'][i]
     print(f'{ticker}: {cik}')
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
-    print(facts['facts']['us-gaap']['CommonStockSharesOutstanding'])
+    print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
     #base_columns = ['start', 'end', 'filed', 'year', 'quarter']
     base_columns = ['end', 'filed', 'year', 'quarter']
     indicators = Indicators()
     total_df = None
-    for indicator in indicators.indicators:
+    #for indicator in indicators.indicators:
+    for indicator in ['WeightedAverageNumberOfDilutedSharesOutstanding']:
         ind_class = IndicatorType(indicator)
         df, years = get_df(facts, ind_class)
         print(df)
