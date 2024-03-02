@@ -3,24 +3,9 @@ import numpy as np
 import pandas as pd
 import datetime
 
+from indicator import Indicators
 
 from matplotlib import pyplot as plt
-
-# class with parameters for each indicator
-# divide by 10000000
-
-
-class Indicators:
-    def __init__(self):
-        self.summarizing_indicators = ['Revenues', 'SalesRevenueNet', 'NetIncomeLoss']
-        self.not_summarizing_indicators = []
-
-        self.units_dict = {'Revenues': 'USD',
-                           'SalesRevenueNet': 'USD',
-                           'NetIncomeLoss': 'USD'}
-
-        self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
-        self.valid_indicators = []
 
 
 class IndicatorType:
@@ -64,6 +49,7 @@ def get_df(myfacts, myind_class, myindicators):
         myyears = None
         return mydf, myyears
     mydf = mydf.rename(columns={'val': myind_class.name})
+    print(mydf)
     mydf['end'] = pd.to_datetime(mydf['end'])
     mydf = mydf.dropna(subset='frame')  # drop rows with null in frame
     mydf['year'] = mydf['end'].dt.year
@@ -117,6 +103,8 @@ def download_metrics(ticker, cik, main_folder_path, headers, n):
     indicators = Indicators()
     total_df = None
     for indicator in indicators.indicators:
+    #for indicator in [indicators.indicators[1]]:
+        print(indicator)
         ind_class = IndicatorType(indicator)
         df, years = get_df(facts, ind_class, indicators)
         if df is None:  # case when ticker doesn't have this indicator
@@ -125,13 +113,14 @@ def download_metrics(ticker, cik, main_folder_path, headers, n):
         indexes_to_update = find_indexes_with_full_year_data(df, years)
         df = convert_full_years_data_to_quarter_data(df, indexes_to_update, ind_class)
         df = df.sort_values(by=['end']).dropna().reset_index(drop=True).reindex(columns=base_columns + [ind_class.name])
+        print(df)
 
         if total_df is None:
             total_df = df
         else:
             total_df = pd.merge(total_df, df, on=['end', 'filed', 'year', 'quarter'])
 
-    print(indicators.valid_indicators)
+    print(f'valid metrics {indicators.valid_indicators}')
     total_df[indicators.valid_indicators] = total_df[indicators.valid_indicators] / 1000000
-
+    print(total_df)
     total_df.to_csv(f'{main_folder_path}metrics\\{ticker}_metrics.csv', index=False)

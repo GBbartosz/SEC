@@ -1,10 +1,13 @@
 import pandas as pd
 
+from dataprocessing import process_data
 from functions import download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
-# CommonStockSharesOutstanding -- prawdopodobnie te shares dla googl
+
+# revenue for googl - RevenueFromContractWithCustomerExcludingAssessedTax
+# zmienic tst na plik na git do wyciagania facts dla tickerow
 
 def pandas_df_display_options():
     pd.reset_option('display.max_rows')
@@ -25,7 +28,8 @@ if __name__ == '__main__':
     headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
     tickers_df = download_tickers_df(headers)
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
-    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'AMZN', 'GOOGL', 'META', 'NVDA', 'TSLA'])]
+    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'AMZN', 'GOOG', 'META', 'NVDA', 'TSLA'])]
+    tickers_df = tickers_df[tickers_df['ticker'] == 'GOOG']
     print(tickers_df.head())
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
@@ -33,9 +37,11 @@ if __name__ == '__main__':
         cik = tickers_df['cik_str'][i]
         ticker = tickers_df['ticker'][i]
         company_name = tickers_df['title'][i]
-        print(ticker)
+        print(f'{ticker}: {cik}')
 
         download_metrics(ticker, cik, main_folder_path, headers, n)
-        download_price_and_shares(ticker, cik, main_folder_path, headers)
+        #download_price_and_shares(ticker, cik, main_folder_path, headers)
+
+        #process_data(ticker, cik, main_folder_path)
 
         n += 1

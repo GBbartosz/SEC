@@ -28,11 +28,11 @@ def correct_errors(df, tic):
 
 
 def download_price_and_shares(ticker, cik, main_folder_path, headers):
+    # niektore firmy nie posiadaja pozycji WeightedAverageNumberOfDilutedSharesOutstanding ktora uwzglednia stock
+    # options, convertible bonds, or warrants (jesli pozycji nie ma to wowczas wskazane zmienne nie wystepuja?)
     share_types = ['WeightedAverageNumberOfDilutedSharesOutstanding', 'CommonStockSharesOutstanding']
-    n = 0
-    print(f'{ticker}: {cik}')
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
-    print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
+    #print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
 
     try:
         share_type = share_types[0]
@@ -65,8 +65,33 @@ def download_price_and_shares(ticker, cik, main_folder_path, headers):
     sharedf['shares'] = sharedf['shares'] / 1000000
     sharedf = sharedf.sort_values(by='end')
     sharedf = correct_errors(sharedf, ticker)
-    sharedf = sharedf.rename(columns={'val': 'WeightedAverageNumberOfDilutedSharesOutstanding'})
-    sharedf = sharedf.drop(['start', 'accn', 'fy', 'fp', 'form', 'frame', 'date'], axis=1)
+    sharedf = sharedf.rename(columns={'val': share_type})
+    try:
+        sharedf = sharedf.drop(['start', 'accn', 'fy', 'fp', 'form', 'frame', 'date'], axis=1)
+    except KeyError:
+        sharedf = sharedf.drop(['accn', 'fy', 'fp', 'form', 'frame', 'date'], axis=1)
 
     pricedf.to_csv(f'{main_folder_path}metrics\\{ticker}_price.csv', index=False)
     sharedf.to_csv(f'{main_folder_path}metrics\\{ticker}_shares.csv', index=False)
+
+    # fig = plt.figure()
+    # plt.plot(sharedf['end'], sharedf['shares'])
+    # plt.title(ticker)
+    # plt.show()
+
+
+#pd.reset_option('display.max_rows')
+#pd.reset_option('display.max_columns')
+#pd.reset_option('display.width')
+#pd.reset_option('display.float_format')
+#pd.reset_option('display.max_colwidth')
+#pd.set_option('display.max_rows', None)
+#pd.set_option('display.max_columns', None)
+#pd.set_option('display.max_colwidth', 40)
+#pd.set_option('display.width', 400)
+#main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+#headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
+#ticker = 'GOOGL'
+#cik = '0001652044'
+#download_price_and_shares(ticker, cik, main_folder_path, headers)
+
