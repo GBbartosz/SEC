@@ -49,17 +49,25 @@ def get_df(myfacts, myind_class, myindicators):
         myyears = None
         return mydf, myyears
     mydf = mydf.rename(columns={'val': myind_class.name})
-    print(mydf)
+
     mydf['end'] = pd.to_datetime(mydf['end'])
     mydf = mydf.dropna(subset='frame')  # drop rows with null in frame
     mydf['year'] = mydf['end'].dt.year
     mydf['quarter'] = mydf['frame'].apply(get_quarter)
+    #print(mydf)
     mydf = mydf.drop(['accn', 'fy', 'fp', 'form', 'frame'], axis=1)
     mydf, myyears, first_year = eliminate_first_year(mydf)
     return mydf, myyears
 
 
 def find_indexes_with_full_year_data(mydf, myyears):
+
+    def count_distinct_previous_quarters():
+        previous_quarters = mydf['quarter'].iloc[ind-3:ind].tolist()  # znajduje 3 poprzednie kwartaly wedlug indeksu w tablicy
+        previous_quarters_without_none = list(filter(None, previous_quarters))
+        count_of_distinct_quarters = len(set(previous_quarters_without_none))  # liczy czy sa rozne (jesli któregoś brakuje i przejdzie do poprzedniego roku rozliczeniowego, index nie zostanie dodany
+        return count_of_distinct_quarters
+
     myindexes_to_update = []
     for year in myyears:
         ydf = mydf[mydf['year'] == year]
@@ -68,7 +76,8 @@ def find_indexes_with_full_year_data(mydf, myyears):
                 ind = ydf[ydf['quarter'].isna()].index[0]
             except IndexError:  # case when there is lacking quarter and there is not full year statement
                 ind = -1
-            if ind >= 3:  # nie mozna odjac poprzednich kwartalow
+            count_of_distinct_quarters = count_distinct_previous_quarters()
+            if ind >= 3 and count_of_distinct_quarters > 2:  # wymagane min 3 kwartaly aby moc od calego roku odjac 3 poprzednie kwartaly; wymagae 3 rozne poprzednie kwartaly aby odjac poprawne okresy od pelnego roku
                 myindexes_to_update.append(ind)
     return myindexes_to_update
 
@@ -99,12 +108,12 @@ def convert_full_years_data_to_quarter_data(mydf, myindexes_to_update, myindclas
 
 def download_metrics(ticker, cik, main_folder_path, headers, n):
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
-    base_columns = ['end', 'filed', 'year', 'quarter']
+    base_columns = ['end', 'year', 'quarter']
     indicators = Indicators()
     total_df = None
     for indicator in indicators.indicators:
-    #for indicator in [indicators.indicators[1]]:
-        print(indicator)
+    #for indicator in [indicators.indicators[0]]:
+        #print(indicator)
         ind_class = IndicatorType(indicator)
         df, years = get_df(facts, ind_class, indicators)
         if df is None:  # case when ticker doesn't have this indicator
@@ -113,14 +122,14 @@ def download_metrics(ticker, cik, main_folder_path, headers, n):
         indexes_to_update = find_indexes_with_full_year_data(df, years)
         df = convert_full_years_data_to_quarter_data(df, indexes_to_update, ind_class)
         df = df.sort_values(by=['end']).dropna().reset_index(drop=True).reindex(columns=base_columns + [ind_class.name])
-        print(df)
+        #print(df)
 
         if total_df is None:
             total_df = df
         else:
-            total_df = pd.merge(total_df, df, on=['end', 'filed', 'year', 'quarter'])
+            total_df = pd.merge(total_df, df, how='outer', on=['end', 'year', 'quarter'])
 
     print(f'valid metrics {indicators.valid_indicators}')
     total_df[indicators.valid_indicators] = total_df[indicators.valid_indicators] / 1000000
-    print(total_df)
+    #print(total_df)
     total_df.to_csv(f'{main_folder_path}metrics\\{ticker}_metrics.csv', index=False)

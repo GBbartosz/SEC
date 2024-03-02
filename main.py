@@ -1,12 +1,13 @@
 import pandas as pd
 
-from dataprocessing import process_data
+#from dataprocessing import process_data
 from functions import download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
+# googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego
 
-# revenue for googl - RevenueFromContractWithCustomerExcludingAssessedTax
+
 # zmienic tst na plik na git do wyciagania facts dla tickerow
 
 def pandas_df_display_options():
@@ -28,8 +29,8 @@ if __name__ == '__main__':
     headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
     tickers_df = download_tickers_df(headers)
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
-    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'AMZN', 'GOOG', 'META', 'NVDA', 'TSLA'])]
-    tickers_df = tickers_df[tickers_df['ticker'] == 'GOOG']
+    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'AMZN', 'GOOGL', 'META', 'NVDA', 'TSLA'])]
+    #tickers_df = tickers_df[tickers_df['ticker'] == 'GOOGL']
     print(tickers_df.head())
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
