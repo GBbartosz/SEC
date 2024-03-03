@@ -16,4 +16,7 @@ class Indicators:
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
         self.valid_indicators = []
+        self.ttm_indicators = [f'ttm_{i}' for i in self.indicators]
+        self.valid_ttm_indicators = []
 
+        self.price_indicators = []
