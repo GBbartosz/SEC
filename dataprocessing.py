@@ -23,17 +23,18 @@ def coalesce(indicators, metricsdf):
         coalesce_group = indicators.coalesce.__getattribute__(attr)
         columns = [c for c in metricsdf.columns if c in coalesce_group]
         if len(columns) == 1:
-            metricsdf[f'ttm_{attr}_coalesce'] = metricsdf[f'ttm_{columns[0]}']
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}']
         if len(columns) == 2:
-            metricsdf[f'ttm_{attr}_coalesce'] = metricsdf[f'ttm_{columns[0]}'].fillna(metricsdf[f'ttm_{columns[1]}'])
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}'])
         if len(columns) == 3:
-            metricsdf[f'ttm_{attr}_coalesce'] = metricsdf[f'ttm_{columns[0]}'].fillna(metricsdf[f'ttm_{columns[1]}']).fillna(metricsdf[f'ttm_{columns[2]}'])
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}'])
         if len(columns) == 4:
-            metricsdf[f'ttm_{attr}_coalesce'] = metricsdf[f'ttm_{columns[0]}'].fillna(metricsdf[f'ttm_{columns[1]}']).fillna(metricsdf[f'ttm_{columns[2]}']).fillna(metricsdf[f'ttm_{columns[3]}'])
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}'])
     return metricsdf
 
 
-def calculate_metrics_indicators(metricsdf):
+def calculate_metrics_indicators(indicators, metricsdf):
+    # create new indicator and add new indicator's name to obj indicators.metrics_indicators
 
     def calculate_profit_margin(metricsdf):
         metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_revenue_coalesce']).round(4)
@@ -45,6 +46,9 @@ def calculate_metrics_indicators(metricsdf):
         return metricsdf
 
     metricsdf = calculate_profit_margin(metricsdf)
+
+    indicators.metrics_indicators = ['ttm_ProfitMargin']
+
     return metricsdf
 
 
@@ -57,7 +61,7 @@ def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
 
     indicators.valid_indicators = [i for i in indicators.indicators if i in totaldf.columns]
     indicators.valid_ttm_indicators = [i for i in indicators.ttm_indicators if i in totaldf.columns]
-    ordered_columns = base_columns + indicators.valid_indicators + indicators.valid_ttm_indicators
+    ordered_columns = base_columns + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.coalesce_indicators + indicators.metrics_indicators
     totaldf = totaldf[ordered_columns]
     totaldf = totaldf.sort_values(by='date')
 
@@ -80,8 +84,8 @@ def fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, p
     # there are left values only for the end of quarters
     direct_join_df = pd.merge_asof(metricsdf, pricedf, left_on='end', right_on='date', direction='forward')[['end', 'date']]
     total_df = total_df.merge(direct_join_df, on=['date', 'end'], how='left', indicator=True)
-    columns_to_apply_nam = [c for c in base_columns if c not in ['date', 'close', 'Volume', 'dividends', 'stock_splits']] + indicators.valid_indicators + indicators.valid_ttm_indicators
-    total_df.loc[total_df['_merge'] == 'left_only', columns_to_apply_nam] = np.nan
+    columns_to_apply_nan = [c for c in base_columns if c not in ['date', 'close', 'Volume', 'dividends', 'stock_splits']] + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.coalesce_indicators + indicators.metrics_indicators
+    total_df.loc[total_df['_merge'] == 'left_only', columns_to_apply_nan] = np.nan
     total_df = total_df.drop('_merge', axis=1)
     return total_df
 
@@ -92,9 +96,9 @@ def process_data(ticker, cik, main_folder_path):
     metrics_folder_path = f'{main_folder_path}metrics\\'
     processed_folder_path = f'{main_folder_path}processed_data\\'
     files = os.listdir(metrics_folder_path)
-    print(files)
+    #print(files)
     ticker_files = [f for f in files if f'{ticker}_' in f]
-    print(ticker_files)
+    #print(ticker_files)
     print('ERROR IN SELECTING TICKER FILES ALGORITHM! Files probably taken from another ticker!') if len(ticker_files) > 3 else None
 
     metricsdf = pd.read_csv(f'{metrics_folder_path}{ticker}_metrics.csv')
@@ -108,27 +112,31 @@ def process_data(ticker, cik, main_folder_path):
 
     metricsdf = summarize_quarters_to_ttm_years(indicators, metricsdf)
     metricsdf = coalesce(indicators, metricsdf)
-    metricsdf = calculate_metrics_indicators(metricsdf)
+    metricsdf = calculate_metrics_indicators(indicators, metricsdf)
     total_df = create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf)
     total_df = calculate_price_indicators(indicators, total_df)
     total_df = fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, pricedf)
     #print(total_df)
+    total_df.to_csv(f'{processed_folder_path}{ticker}_processed.csv', index=False)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=total_df['date'], y=total_df['market_capitalization'], mode='lines+markers'))
-    fig.show()
+    # fig = go.Figure()
+    # fig.add_trace(go.Scatter(x=total_df['end'], y=total_df['ttm_NetIncomeLoss'], mode='lines+markers'))
+    # fig.add_trace(go.Scatter(x=total_df['date'], y=total_df['ttm_Revenues'], mode='lines+markers'))
+    # fig.add_trace(go.Scatter(x=total_df['date'], y=total_df['ttm_revenue_coalesce'], mode='lines+markers'))
+    # fig.update_traces(connectgaps=True)
+    # fig.show()
 
 
-pd.reset_option('display.max_rows')
-pd.reset_option('display.max_columns')
-pd.reset_option('display.width')
-pd.reset_option('display.float_format')
-pd.reset_option('display.max_colwidth')
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_colwidth', 40)
-pd.set_option('display.width', 400)
-ticker = 'GOOGL'
-cik = '0001652044'
-main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-process_data(ticker, cik, main_folder_path)
+# pd.reset_option('display.max_rows')
+# pd.reset_option('display.max_columns')
+# pd.reset_option('display.width')
+# pd.reset_option('display.float_format')
+# pd.reset_option('display.max_colwidth')
+# pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_colwidth', 40)
+# pd.set_option('display.width', 400)
+# ticker = 'GOOGL'
+# cik = '0001652044'
+# main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+# process_data(ticker, cik, main_folder_path)

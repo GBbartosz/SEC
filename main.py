@@ -1,14 +1,12 @@
 import pandas as pd
 
-#from dataprocessing import process_data
+from dataprocessing import process_data
 from functions import download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
-# googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego
+# googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
 
-
-# zmienic tst na plik na git do wyciagania facts dla tickerow
 
 def pandas_df_display_options():
     pd.reset_option('display.max_rows')
@@ -41,8 +39,8 @@ if __name__ == '__main__':
         print(f'{ticker}: {cik}')
 
         download_metrics(ticker, cik, main_folder_path, headers, n)
-        #download_price_and_shares(ticker, cik, main_folder_path, headers)
+        download_price_and_shares(ticker, cik, main_folder_path, headers)
 
-        #process_data(ticker, cik, main_folder_path)
+        process_data(ticker, cik, main_folder_path)
 
         n += 1
