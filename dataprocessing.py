@@ -34,7 +34,7 @@ def coalesce(indicators, metricsdf):
 
 
 def calculate_metrics_indicators(indicators, metricsdf):
-    # create new indicator and add new indicator's name to obj indicators.metrics_indicators
+    # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
     def calculate_profit_margin(metricsdf):
         metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_revenue_coalesce']).round(4)
@@ -46,8 +46,6 @@ def calculate_metrics_indicators(indicators, metricsdf):
         return metricsdf
 
     metricsdf = calculate_profit_margin(metricsdf)
-
-    indicators.metrics_indicators = ['ttm_ProfitMargin']
 
     return metricsdf
 
@@ -69,11 +67,9 @@ def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
 
 
 def calculate_price_indicators(indicators, total_df):
-    # create new indicator and add new indicator's name to obj indicators.price_indicators
+    # create new indicator and add new indicator's name to obj indicators.price_indicators in file indicators
 
     total_df['market_capitalization'] = total_df['shares'] * total_df['close']
-
-    indicators.price_indicators = ['market_capitalization']
 
     return total_df
 

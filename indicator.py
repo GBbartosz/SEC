@@ -9,7 +9,7 @@ class Indicators:
         self.not_summarizing_indicators = []
         self.coalesce = Coalesce()
         self.coalesce_indicators = list(self.coalesce.__dict__.keys())
-        self.metrics_indicators = []
+        self.metrics_indicators = ['ttm_ProfitMargin']
 
         self.units_dict = {'Revenues': 'USD',
                            'SalesRevenueNet': 'USD',
@@ -21,4 +21,7 @@ class Indicators:
         self.ttm_indicators = [f'ttm_{i}' for i in self.indicators]
         self.valid_ttm_indicators = []
 
-        self.price_indicators = []
+        self.price = ['close', 'Volume']
+        self.price_indicators = ['market_capitalization']
+
+        self.all_indicators = self.price + self.ttm_indicators + self.coalesce_indicators + self.metrics_indicators + self.price_indicators

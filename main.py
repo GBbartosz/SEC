@@ -5,6 +5,11 @@ from functions import download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
+# slownik kolorow
+# markery dla indicators
+# nowe wskazniki
+# sprawdzic poprawnosc aktualnych
+
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
 
 
