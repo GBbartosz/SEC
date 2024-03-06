@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pandas as pd
 import plotly.graph_objects as go
+import random
+from functions import plotly_markers, ticker_color_dict
 from indicator import Indicators
 import dashboard_objects as dash_obj
 
@@ -23,6 +25,12 @@ class MainChart:
         self.fig = go.Figure()
         for ticker in self.tickers:
             df = pd.read_csv(f'{self.processed_folder_path}{ticker}_processed.csv')
+
+            if ticker in ticker_color_dict.keys():
+                color = ticker_color_dict[ticker]
+            else:
+                color = f'rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})'
+            m = 0
             for indicator in self.indicators:
                 x = df['date']
                 try:
@@ -30,7 +38,16 @@ class MainChart:
                 except KeyError:
                     df[indicator] = np.nan
                     y = df[indicator]
-                self.fig.add_trace(go.Scatter(name=ticker, x=x, y=y, mode='lines+markers'))
+
+                size = 4 if len([ynn for ynn in y if not np.isnan(ynn)]) > 1000 else 8
+
+                self.fig.add_trace(go.Scatter(name=ticker,
+                                              x=x,
+                                              y=y,
+                                              mode='lines+markers',
+                                              marker=dict(symbol=plotly_markers[m], size=size),
+                                              line=dict(color=color)))
+                m += 1
         self.fig.update_traces(connectgaps=True)
 
 

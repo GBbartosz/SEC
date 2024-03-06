@@ -36,16 +36,9 @@ def coalesce(indicators, metricsdf):
 def calculate_metrics_indicators(indicators, metricsdf):
     # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
-    def calculate_profit_margin(metricsdf):
-        metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_revenue_coalesce']).round(4)
+    metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_revenue_coalesce']).round(4)
 
-        # Perform the calculation using np.where()
-        #metricsdf['ttm_ProfitMargin'] = np.where(metricsdf['ttm_Revenues'].isna(),
-        #                  (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_RevenueFromContractWithCustomerExcludingAssessedTax']).round(2),
-        #                  (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_Revenues']).round(2))
-        return metricsdf
-
-    metricsdf = calculate_profit_margin(metricsdf)
+    metricsdf['ttm_revenue_coalesce_growth_1y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(4) - 1, 2)
 
     return metricsdf
 
@@ -70,6 +63,10 @@ def calculate_price_indicators(indicators, total_df):
     # create new indicator and add new indicator's name to obj indicators.price_indicators in file indicators
 
     total_df['market_capitalization'] = total_df['shares'] * total_df['close']
+
+    total_df['ttm_P/E'] = round(total_df['market_capitalization'] / total_df['ttm_NetIncomeLoss'], 2)
+
+    total_df['ttm_P/S'] = round(total_df['market_capitalization'] / total_df['ttm_revenue_coalesce'], 2)
 
     return total_df
 
