@@ -30,8 +30,17 @@ class Indicators:
         self.valid_ttm_indicators = []
 
         self.price = ['close', 'Volume']
-        self.price_indicators = ['market_capitalization',
+        self.price_indicators = ['close_1y_avg',
+                                 'close_3y_avg',
+                                 'close_5y_avg',
+                                 'market_capitalization',
                                  'ttm_P/E',
-                                 'ttm_P/S']
+                                 'ttm_P/E_1y_avg',
+                                 'ttm_P/E_3y_avg',
+                                 'ttm_P/E_5y_avg'
+                                 'ttm_P/S',
+                                 'ttm_P/S_1y_avg',
+                                 'ttm_P/S_3y_avg',
+                                 'ttm_P/S_5y_avg']
 
         self.all_indicators = self.price + self.ttm_indicators + self.coalesce_indicators + self.metrics_indicators + self.price_indicators

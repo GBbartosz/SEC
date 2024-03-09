@@ -6,7 +6,6 @@ from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
 # nowe wskazniki
-# sprawdzic poprawnosc aktualnych
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
 

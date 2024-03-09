@@ -9,6 +9,8 @@ def download_tickers_df(headers):
     return mytickers_df
 
 
+plotly_lines = ['solid', 'dash', 'dot', 'dashdot', 'longdash', 'longdashdot']
+
 plotly_markers = ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up', 'triangle-down', 'pentagon']
 
 ticker_color_dict = {'AAPL': 'green',

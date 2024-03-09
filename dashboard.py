@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 import random
-from functions import plotly_markers, ticker_color_dict
+from functions import plotly_lines, plotly_markers, ticker_color_dict
 from indicator import Indicators
 import dashboard_objects as dash_obj
 
@@ -30,7 +30,8 @@ class MainChart:
                 color = ticker_color_dict[ticker]
             else:
                 color = f'rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})'
-            m = 0
+            pl = -1
+            pm = -1
             for indicator in self.indicators:
                 x = df['date']
                 try:
@@ -39,15 +40,26 @@ class MainChart:
                     df[indicator] = np.nan
                     y = df[indicator]
 
-                size = 4 if len([ynn for ynn in y if not np.isnan(ynn)]) > 1000 else 8
+                # changing line type for data with many values (close price) and changing markers for data with few values (revenue)
+                constant_line = all(False if np.isnan(a) else True for a in y[-5:-1])  # checks last 5 values if all are not nan
+                if constant_line:
+                    mode = 'lines'
+                    pl += 1
+                    line_idx = pl
+                    marker_idx = 0
+                else:
+                    mode = 'lines+markers'
+                    pm += 1
+                    line_idx = 0
+                    marker_idx = pm
 
                 self.fig.add_trace(go.Scatter(name=ticker,
                                               x=x,
                                               y=y,
-                                              mode='lines+markers',
-                                              marker=dict(symbol=plotly_markers[m], size=size),
-                                              line=dict(color=color)))
-                m += 1
+                                              mode=mode,
+                                              line=dict(dash=plotly_lines[line_idx], color=color),
+                                              marker=dict(symbol=plotly_markers[marker_idx], color=color, size=8)))
+
         self.fig.update_traces(connectgaps=True)
 
 
