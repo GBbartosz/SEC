@@ -1,26 +1,16 @@
 import pandas as pd
 
+from currentdata import current_data
 from dataprocessing import process_data
-from functions import download_tickers_df
+from functions import pandas_df_display_options, download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
 # nowe wskazniki
+# second y axis
+# subdropdown
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
-
-
-def pandas_df_display_options():
-    pd.reset_option('display.max_rows')
-    pd.reset_option('display.max_columns')
-    pd.reset_option('display.width')
-    pd.reset_option('display.float_format')
-    pd.reset_option('display.max_colwidth')
-
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_colwidth', 40)
-    pd.set_option('display.width', 400)
 
 
 if __name__ == '__main__':
@@ -46,3 +36,5 @@ if __name__ == '__main__':
         process_data(ticker, cik, main_folder_path)
 
         n += 1
+
+    current_data(main_folder_path)

@@ -74,23 +74,23 @@ def calculate_price_indicators(indicators, total_df):
     year_window = 252
     min_year_window = 248
 
-    total_df['close_1y_avg'] = total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean()
-    total_df['close_3y_avg'] = total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean()
-    total_df['close_5y_avg'] = total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean()
+    total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
+    total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
+    total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
-    total_df['market_capitalization'] = total_df['shares'] * total_df['close']
+    total_df['market_capitalization'] = round(total_df['shares'] * total_df['close'], 0)
 
     total_df['ttm_P/E'] = round(total_df['market_capitalization'] / total_df['ttm_NetIncomeLoss'], 2)
 
-    total_df['ttm_P/E_1y_avg'] = total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean()
-    total_df['ttm_P/E_3y_avg'] = total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean()
-    total_df['ttm_P/E_5y_avg'] = total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean()
+    total_df['ttm_P/E_1y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
+    total_df['ttm_P/E_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
+    total_df['ttm_P/E_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
     total_df['ttm_P/S'] = round(total_df['market_capitalization'] / total_df['ttm_revenue_coalesce'], 2)
 
-    total_df['ttm_P/S_1y_avg'] = total_df['ttm_P/S'].rolling(window=year_window, min_periods=min_year_window).mean()
-    total_df['ttm_P/S_3y_avg'] = total_df['ttm_P/S'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean()
-    total_df['ttm_P/S_5y_avg'] = total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean()
+    total_df['ttm_P/S_1y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
+    total_df['ttm_P/S_3y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
+    total_df['ttm_P/S_5y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
     return total_df
 

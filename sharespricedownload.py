@@ -56,6 +56,7 @@ def download_price_and_shares(ticker, cik, main_folder_path, headers):
     pricedf['date'] = pd.to_datetime(pricedf['date'])
     pricedf['date'] = pricedf['date'].dt.date
     pricedf['date'] = pd.to_datetime(pricedf['date'])
+    pricedf['close'] = pricedf['close'].round(2)
     stock_split_df = pricedf[pricedf['stock_splits'] > 0][['date', 'stock_splits']]
 
     sharedf = pd.merge_asof(sharedf, stock_split_df, left_on='filed', right_on='date', direction='forward')

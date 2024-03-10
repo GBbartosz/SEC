@@ -2,6 +2,19 @@ import requests
 import pandas as pd
 
 
+def pandas_df_display_options():
+    pd.reset_option('display.max_rows')
+    pd.reset_option('display.max_columns')
+    pd.reset_option('display.width')
+    pd.reset_option('display.float_format')
+    pd.reset_option('display.max_colwidth')
+
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_colwidth', 40)
+    pd.set_option('display.width', 400)
+
+
 def download_tickers_df(headers):
     mytickers = requests.get('https://www.sec.gov/files/company_tickers.json', headers=headers).json()
     mytickers_df = pd.DataFrame(mytickers).transpose()

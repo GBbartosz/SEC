@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 import numpy as np
 import os
@@ -19,7 +19,9 @@ class Keeper:
 
 class MainChart:
     def __init__(self):
-        self.processed_folder_path = f'C:\\Users\\barto\\Desktop\\SEC2024\\processed_data\\'
+        global main_folder_path
+
+        self.processed_folder_path = f'{main_folder_path}processed_data\\'
         self.tickers = keeper.tickers
         self.indicators = keeper.indicators
         self.fig = go.Figure()
@@ -63,19 +65,6 @@ class MainChart:
         self.fig.update_traces(connectgaps=True)
 
 
-def pandas_df_display_options():
-    pd.reset_option('display.max_rows')
-    pd.reset_option('display.max_columns')
-    pd.reset_option('display.width')
-    pd.reset_option('display.float_format')
-    pd.reset_option('display.max_colwidth')
-
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_colwidth', 40)
-    pd.set_option('display.width', 400)
-
-
 def read_files():
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
     processed_folder_path = f'{main_folder_path}processed_data\\'
@@ -89,6 +78,7 @@ def main_page(indicators):
     global tickers
 
     layout_main_page = html.Div([
+        html.Div([dash_obj.page_link('CurrentDataLink', 'Current Data Table', '/current_data')]),
         html.Div([
             html.Div([dash_obj.dd_indicators(indicators.all_indicators)], style={'width': '50%', 'display': 'inline-block'}),
             html.Div([dash_obj.dd_tickers(tickers)], style={'width': '50%', 'display': 'inline-block'})
@@ -117,6 +107,24 @@ def main_page(indicators):
         return MainChart().fig
 
 
+def current_status():
+    global main_folder_path
+
+    current_df = pd.read_csv(f'{main_folder_path}current_data\\current_data.csv')
+
+    layout_current_status_page = html.Div([
+        html.Div(
+            dash_table.DataTable(id='current_status_table',
+                                 data=current_df.to_dict('records')
+
+            )
+        )
+    ])
+
+    dash.register_page('CurrentStatus', path='/current_data', layout=layout_current_status_page)
+
+
+main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
 tickers = read_files()
 indicators = Indicators()
 keeper = Keeper()
@@ -124,4 +132,5 @@ keeper = Keeper()
 app = dash.Dash(__name__, pages_folder="", use_pages=True)
 
 main_page(indicators)
+current_status()
 app.run_server(debug=True)
