@@ -2,16 +2,10 @@ import dash
 from dash import dcc
 
 
-def dd_indicators(all_indicators):
-    obj = dcc.Dropdown(id='dd_indicators',
+def dd_indicators(obj_id, placeholder, all_indicators):
+    obj = dcc.Dropdown(id=obj_id,
+                       placeholder=placeholder,
                        options=all_indicators,
-                       multi=True)
-    return obj
-
-
-def dd_tickers(all_tickers):
-    obj = dcc.Dropdown(id='dd_tickers',
-                       options=all_tickers,
                        multi=True)
     return obj
 

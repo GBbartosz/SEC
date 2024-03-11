@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from functions import pandas_df_display_options
 
 
 def current_data(main_folder_path):
@@ -28,9 +29,13 @@ def current_data(main_folder_path):
                                   'ttm_Revenues',
                                   'ttm_SalesRevenueNet',
                                   'ttm_RevenueFromContractWithCustomerExcludingAssessedTax'])
-    # print(current_df)
+    current_df = current_df.T
+
+    print(current_df)
+
     current_df.to_csv(f'{current_data_folder}current_data.csv')
 
-# pandas_df_display_options()
-# main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-# current_data(main_folder_path)
+
+pandas_df_display_options()
+main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+current_data(main_folder_path)

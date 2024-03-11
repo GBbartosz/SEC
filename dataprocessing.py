@@ -38,15 +38,29 @@ def coalesce(indicators, metricsdf):
 def calculate_metrics_indicators(indicators, metricsdf):
     # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
+    year_window = 4
+
+    # Profit Margin
     metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_revenue_coalesce']).round(4)
 
-    metricsdf['ttm_revenue_coalesce_growth_1y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(4) - 1, 2)
-    metricsdf['ttm_revenue_coalesce_growth_3y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(12) - 1, 2)
-    metricsdf['ttm_revenue_coalesce_growth_5y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(20) - 1, 2)
+    metricsdf['ttm_ProfitMargin_3y_avg'] = round(metricsdf['ttm_ProfitMargin'].rolling(window=year_window * 3, min_periods=year_window * 3).mean(), 4)
+    metricsdf['ttm_ProfitMargin_5y_avg'] = round(metricsdf['ttm_ProfitMargin'].rolling(window=year_window * 5, min_periods=year_window * 5).mean(), 4)
 
-    metricsdf['ttm_NetIncomeLoss_growth_1y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(4) - 1, 2)
-    metricsdf['ttm_NetIncomeLoss_growth_3y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(12) - 1, 2)
-    metricsdf['ttm_NetIncomeLoss_growth_5y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(20) - 1, 2)
+    # Revenue
+    metricsdf['ttm_revenue_coalesce_growth_1y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 1) - 1, 2)
+    metricsdf['ttm_revenue_coalesce_growth_3y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 3) - 1, 2)
+    metricsdf['ttm_revenue_coalesce_growth_5y'] = round(metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 5) - 1, 2)
+
+    metricsdf['ttm_revenue_coalesce_growth_3y_avg'] = round((metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 3)) ** (1 / 3) - 1, 2)
+    metricsdf['ttm_revenue_coalesce_growth_5y_avg'] = round((metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
+
+    # Net Income
+    metricsdf['ttm_NetIncomeLoss_growth_1y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(year_window * 1) - 1, 2)
+    metricsdf['ttm_NetIncomeLoss_growth_3y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(year_window * 3) - 1, 2)
+    metricsdf['ttm_NetIncomeLoss_growth_5y'] = round(metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(year_window * 5) - 1, 2)
+
+    metricsdf['ttm_NetIncomeLoss_growth_3y_avg'] = round((metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(year_window * 3)) ** (1 / 3) - 1, 2)
+    metricsdf['ttm_NetIncomeLoss_growth_5y_avg'] = round((metricsdf['ttm_NetIncomeLoss'] / metricsdf['ttm_NetIncomeLoss'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
 
     return metricsdf
 
@@ -74,23 +88,39 @@ def calculate_price_indicators(indicators, total_df):
     year_window = 252
     min_year_window = 248
 
+    # Price
     total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
+    # market capitalization
     total_df['market_capitalization'] = round(total_df['shares'] * total_df['close'], 0)
 
+    total_df['market_capitalization_growth_1y'] = round(total_df['market_capitalization'] / total_df['market_capitalization'].shift(year_window * 1) - 1, 2)
+    total_df['market_capitalization_growth_3y'] = round(total_df['market_capitalization'] / total_df['market_capitalization'].shift(year_window * 3) - 1, 2)
+    total_df['market_capitalization_growth_5y'] = round(total_df['market_capitalization'] / total_df['market_capitalization'].shift(year_window * 5) - 1, 2)
+
+    # P/E
     total_df['ttm_P/E'] = round(total_df['market_capitalization'] / total_df['ttm_NetIncomeLoss'], 2)
 
     total_df['ttm_P/E_1y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['ttm_P/E_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['ttm_P/E_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
+    # PEG
+    total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_P/E'] / total_df['ttm_NetIncomeLoss_growth_3y_avg'], 2)
+    total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_P/E'] / total_df['ttm_NetIncomeLoss_growth_5y_avg'], 2)
+
+    # P/S
     total_df['ttm_P/S'] = round(total_df['market_capitalization'] / total_df['ttm_revenue_coalesce'], 2)
 
     total_df['ttm_P/S_1y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['ttm_P/S_3y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['ttm_P/S_5y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
+
+    # PSG - PEG for revenue
+    total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / total_df['ttm_revenue_coalesce_growth_3y_avg'], 2)
+    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / total_df['ttm_revenue_coalesce_growth_5y_avg'], 2)
 
     return total_df
 

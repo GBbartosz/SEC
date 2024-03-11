@@ -19,7 +19,7 @@ if __name__ == '__main__':
     headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
     tickers_df = download_tickers_df(headers)
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
-    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'AMZN', 'GOOGL', 'META', 'NVDA', 'TSLA'])]
+    tickers_df = tickers_df[tickers_df['ticker'].isin(['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA'])]
     #tickers_df = tickers_df[tickers_df['ticker'] == 'GOOGL']
     print(tickers_df.head())
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
@@ -30,8 +30,8 @@ if __name__ == '__main__':
         company_name = tickers_df['title'][i]
         print(f'{ticker}: {cik}')
 
-        download_metrics(ticker, cik, main_folder_path, headers, n)
-        download_price_and_shares(ticker, cik, main_folder_path, headers)
+        #download_metrics(ticker, cik, main_folder_path, headers, n)
+        #download_price_and_shares(ticker, cik, main_folder_path, headers)
 
         process_data(ticker, cik, main_folder_path)
 
