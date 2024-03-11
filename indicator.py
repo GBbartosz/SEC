@@ -6,7 +6,7 @@ class Coalesce:
 
 
 class Indicators:
-    def __init__(self):
+    def __init__(self, currency='USD'):
         self.summarizing_indicators = ['Revenues',
                                        'SalesRevenueNet',
                                        'RevenueFromContractWithCustomerExcludingAssessedTax',
@@ -30,10 +30,10 @@ class Indicators:
                                    'ttm_NetIncomeLoss_growth_3y_avg',
                                    'ttm_NetIncomeLoss_growth_5y_avg']
 
-        self.units_dict = {'Revenues': 'USD',
-                           'SalesRevenueNet': 'USD',
-                           'RevenueFromContractWithCustomerExcludingAssessedTax': 'USD',
-                           'NetIncomeLoss': 'USD'}
+        self.units_dict = {'Revenues': currency,
+                           'SalesRevenueNet': currency,
+                           'RevenueFromContractWithCustomerExcludingAssessedTax': currency,
+                           'NetIncomeLoss': currency}
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
         self.valid_indicators = []

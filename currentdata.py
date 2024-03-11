@@ -30,12 +30,13 @@ def current_data(main_folder_path):
                                   'ttm_SalesRevenueNet',
                                   'ttm_RevenueFromContractWithCustomerExcludingAssessedTax'])
     current_df = current_df.T
+    current_df = current_df.rename_axis('Stock')
 
-    print(current_df)
+    # print(current_df)
 
     current_df.to_csv(f'{current_data_folder}current_data.csv')
 
 
-pandas_df_display_options()
-main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-current_data(main_folder_path)
+#pandas_df_display_options()
+#main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+#current_data(main_folder_path)

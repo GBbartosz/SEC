@@ -2,10 +2,11 @@ import dash
 from dash import dcc
 
 
-def dd_indicators(obj_id, placeholder, all_indicators):
+def dd_indicators(obj_id, placeholder, all_indicators, initial_value):
     obj = dcc.Dropdown(id=obj_id,
                        placeholder=placeholder,
                        options=all_indicators,
+                       value=initial_value,
                        multi=True)
     return obj
 

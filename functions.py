@@ -2,6 +2,32 @@ import requests
 import pandas as pd
 
 
+class TickerType:
+    def __init__(self):
+        self.name = None
+        self.tickers = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']  # usuniety TSM
+
+        self.us_gaap = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']
+        self.ifrs_full = ['TSM']
+
+        self.currency_usd = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']
+        self.currency_twd = ['TSM']
+
+    def get_facts_key(self):
+        if self.name in self.us_gaap:
+            mykey = 'us-gaap'
+        elif self.name in self.ifrs_full:
+            mykey = 'ifrs-full'
+        return mykey
+
+    def get_units_key(self):
+        if self.name in self.currency_usd:
+            mykey = 'USD'
+        elif self.name in self.currency_twd:
+            mykey = 'TWD'
+        return mykey
+
+
 def pandas_df_display_options():
     pd.reset_option('display.max_rows')
     pd.reset_option('display.max_columns')
@@ -34,4 +60,6 @@ ticker_color_dict = {'AAPL': 'green',
                      'MSFT': ' #66CC33',
                      'NFLX': '#D81F26',
                      'NVDA': '#76B900',
-                     'TSLA': '#E82127'}
+                     'TSLA': '#E82127',
+                     'TSM': '#bb8f8f',
+                     'TXN': '#de538a'}

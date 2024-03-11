@@ -4,13 +4,14 @@ import pandas as pd
 import datetime
 
 from indicator import Indicators
+from functions import TickerType
 
 from matplotlib import pyplot as plt
 
 
 class IndicatorType:
-    def __init__(self, name):
-        self.indicators = Indicators()
+    def __init__(self, name, currency):
+        self.indicators = Indicators(currency)
         self.name = name
 
         if self.name in self.indicators.summarizing_indicators:
@@ -26,7 +27,7 @@ def print_metric_information(myind_class, myfacts, n):
         print(myfacts['facts']['us-gaap'][myind_class.name])
 
 
-def get_df(myfacts, myind_class, myindicators):
+def get_df(myfacts, myind_class, myindicators, tict):
 
     def get_quarter(x):
         return x[-2:] if pd.isna(x) is False and 'Q' in x else None
@@ -41,8 +42,12 @@ def get_df(myfacts, myind_class, myindicators):
         mydf2 = mydf2.reset_index(drop=True)
         return mydf2, myyears2, myfirst_year
 
+    #print(myind_class.units)
+    #print(tict.get_facts_key())
+    #print(myind_class.name)
+    #print(myfacts['facts'][tict.get_facts_key()].keys())
     try:
-        mydf = pd.DataFrame(myfacts['facts']['us-gaap'][myind_class.name]['units'][myind_class.units])
+        mydf = pd.DataFrame(myfacts['facts'][tict.get_facts_key()][myind_class.name]['units'][myind_class.units])
         myindicators.valid_indicators.append(myind_class.name)
     except KeyError:
         mydf = None
@@ -106,7 +111,10 @@ def convert_full_years_data_to_quarter_data(mydf, myindexes_to_update, myindclas
     return mydf
 
 
-def download_metrics(ticker, cik, main_folder_path, headers, n):
+def download_metrics(tict, ticker, cik, main_folder_path, headers, n):
+
+    tict.name = ticker
+    currency_key = tict.get_units_key()
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
     base_columns = ['end', 'year', 'quarter']
     indicators = Indicators()
@@ -114,8 +122,8 @@ def download_metrics(ticker, cik, main_folder_path, headers, n):
     for indicator in indicators.indicators:
     #for indicator in [indicators.indicators[0]]:
         #print(indicator)
-        ind_class = IndicatorType(indicator)
-        df, years = get_df(facts, ind_class, indicators)
+        ind_class = IndicatorType(indicator, currency_key)
+        df, years = get_df(facts, ind_class, indicators, tict)
         if df is None:  # case when ticker doesn't have this indicator
             continue
         print_metric_information(ind_class, facts, n)
