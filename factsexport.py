@@ -5,6 +5,7 @@ import requests
 
 headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
 cik = '0001652044'  # googl
+cik = '0001403161' # visa
 
 facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
 factsl = []

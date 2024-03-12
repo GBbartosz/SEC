@@ -30,16 +30,28 @@ def correct_errors(df, tic):
 def download_price_and_shares(ticker, cik, main_folder_path, headers):
     # niektore firmy nie posiadaja pozycji WeightedAverageNumberOfDilutedSharesOutstanding ktora uwzglednia stock
     # options, convertible bonds, or warrants (jesli pozycji nie ma to wowczas wskazane zmienne nie wystepuja?)
-    share_types = ['WeightedAverageNumberOfDilutedSharesOutstanding', 'CommonStockSharesOutstanding']
+    share_types = {'WeightedAverageNumberOfDilutedSharesOutstanding': 'shares',
+                   'CommonStockSharesOutstanding': 'shares',
+                   'PreferredStockValueOutstanding': 'USD'}
     facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
-    #print(facts['facts']['us-gaap']['WeightedAverageNumberOfDilutedSharesOutstanding'])
+    #print(facts['facts']['us-gaap'].keys())
 
-    try:
-        share_type = share_types[0]
-        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
-    except KeyError:  # gdy WeightedAverageNumberOfDilutedSharesOutstanding nei wystepuje ddla tickera
-        share_type = share_types[1]
-        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
+    for share_type in share_types.keys():
+        try:
+            sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units'][share_types[share_type]])
+            break
+        except KeyError:
+            continue
+    #try:
+    #    share_type = share_types[0]
+    #    sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
+    #except KeyError:  # gdy WeightedAverageNumberOfDilutedSharesOutstanding nei wystepuje ddla tickera
+    #    try:
+    #        share_type = share_types[1]
+    #        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
+    #    except KeyError:
+    #        share_type = share_types[2]
+    #        sharedf = pd.DataFrame(facts['facts']['us-gaap'][share_type]['units']['shares'])
 
     sharedf = sharedf.dropna(subset='frame')
     sharedf['end'] = pd.to_datetime(sharedf['end'])

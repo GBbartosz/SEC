@@ -5,12 +5,13 @@ import pandas as pd
 class TickerType:
     def __init__(self):
         self.name = None
-        self.tickers = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']  # usuniety TSM
+        self.tickers = ['AAPL', 'ADBE', 'AMD', 'AMZN', 'AVGO', 'BABA', 'BIDU', 'COST', 'DIS', 'GOOGL', 'INTC', 'LLY', 'MA', 'MCD', 'META', 'MSFT', 'NFLX', 'NKE', 'NVDA', 'PFE', 'QCOM', 'TSLA', 'TXN', 'V', 'WMT']  # usuniety TSM
 
-        self.us_gaap = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']
+        self.us_gaap = ['AAPL', 'ADBE', 'AMD', 'AMZN', 'AVGO', 'BABA', 'BIDU', 'COST', 'DIS', 'GOOGL', 'INTC', 'LLY', 'MA', 'MCD', 'META', 'MSFT', 'NFLX', 'NKE', 'NVDA', 'PFE', 'QCOM', 'TSLA', 'TXN', 'V', 'WMT']  # usuniety TSM
+
         self.ifrs_full = ['TSM']
 
-        self.currency_usd = ['AAPL', 'ADBE', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA', 'TXN']
+        self.currency_usd = ['AAPL', 'ADBE', 'AMD', 'AMZN', 'AVGO', 'BABA', 'BIDU', 'COST', 'DIS', 'GOOGL', 'INTC', 'LLY', 'MA', 'MCD', 'META', 'MSFT', 'NFLX', 'NKE', 'NVDA', 'PFE', 'QCOM', 'TSLA', 'TXN', 'V', 'WMT']  # usuniety TSM
         self.currency_twd = ['TSM']
 
     def get_facts_key(self):
