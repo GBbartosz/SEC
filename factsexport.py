@@ -5,7 +5,10 @@ import requests
 
 headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
 cik = '0001652044'  # googl
-cik = '0001403161' # visa
+cik = '0001403161'  # visa
+cik = '0001141391'  # MA
+cik = '0001730168'  # AVGO
+
 
 facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
 factsl = []

@@ -69,10 +69,12 @@ def download_price_and_shares(ticker, cik, main_folder_path, headers):
     pricedf['date'] = pricedf['date'].dt.date
     pricedf['date'] = pd.to_datetime(pricedf['date'])
     pricedf['close'] = pricedf['close'].round(2)
-    stock_split_df = pricedf[pricedf['stock_splits'] > 0][['date', 'stock_splits']]
+
+    stock_split_df = pricedf[pricedf['stock_splits'] > 0][['date', 'stock_splits']].reset_index(drop=True)
+    next_row_exists = stock_split_df['stock_splits'].shift(-1).notna()
+    stock_split_df.loc[next_row_exists, 'stock_splits'] *= stock_split_df['stock_splits'].shift(-1)
 
     sharedf = pd.merge_asof(sharedf, stock_split_df, left_on='filed', right_on='date', direction='forward')
-
     sharedf['stock_splits'] = sharedf['stock_splits'].bfill()
     sharedf['shares'] = sharedf.apply(lambda x: x['val'] if pd.isna(x['stock_splits']) else x['val'] * x['stock_splits'], axis=1)
     sharedf['shares'] = sharedf['shares'] / 1000000
@@ -104,7 +106,7 @@ def download_price_and_shares(ticker, cik, main_folder_path, headers):
 #pd.set_option('display.width', 400)
 #main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
 #headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
-#ticker = 'GOOGL'
-#cik = '0001652044'
+#ticker = 'TSLA'
+#cik = '0001318605'
 #download_price_and_shares(ticker, cik, main_folder_path, headers)
 

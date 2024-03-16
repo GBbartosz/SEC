@@ -53,6 +53,31 @@ def get_df(myfacts, myind_class, myindicators, tict):
         mydf = None
         myyears = None
         return mydf, myyears
+    print(mydf)
+
+    # Step 1: Filter DataFrame to include only quarterly data
+    quarterly_df = mydf[mydf['fp'].str.startswith('Q')]
+
+    # Step 2: Create a DataFrame with all quarters
+    all_quarters = pd.date_range(start=quarterly_df['start'].min(), end=quarterly_df['end'].max(), freq='Q')
+    all_quarters_df = pd.DataFrame(index=all_quarters)
+
+    # Convert 'start' column in quarterly_df to datetime
+    quarterly_df['start'] = pd.to_datetime(quarterly_df['start'])
+    # Step 3: Merge quarterly_df with all_quarters_df
+    merged_df = pd.merge(all_quarters_df, quarterly_df, left_index=True, right_on='start', how='left')
+
+    # Step 4: Fill missing values with the last known value (forward fill)
+    merged_df['val'] = merged_df['val'].ffill()
+
+    # Reindex the DataFrame to set the dates as the index
+    merged_df = merged_df.set_index('start')
+
+    # Display the final DataFrame with missing quarter values filled
+    print(merged_df)
+
+
+
     mydf = mydf.rename(columns={'val': myind_class.name})
 
     mydf['end'] = pd.to_datetime(mydf['end'])
@@ -119,11 +144,12 @@ def download_metrics(tict, ticker, cik, main_folder_path, headers, n):
     base_columns = ['end', 'year', 'quarter']
     indicators = Indicators()
     total_df = None
-    for indicator in indicators.indicators:
-    #for indicator in [indicators.indicators[0]]:
-        #print(indicator)
+    #for indicator in indicators.indicators:
+    for indicator in [indicators.indicators[0]]:
+        print(indicator)
         ind_class = IndicatorType(indicator, currency_key)
         df, years = get_df(facts, ind_class, indicators, tict)
+        #print(df)
         if df is None:  # case when ticker doesn't have this indicator
             continue
         print_metric_information(ind_class, facts, n)

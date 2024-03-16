@@ -3,6 +3,8 @@ class Coalesce:
         self.ttm_revenue_coalesce = ['ttm_Revenues',
                                      'ttm_SalesRevenueNet',
                                      'ttm_RevenueFromContractWithCustomerExcludingAssessedTax']  # obliczany tylko dla odmian ttm wskaznikow z listy
+        self.ttm_net_income_coalesce = ['NetIncomeLoss',
+                                        'ProfitLoss']
 
 
 class Indicators:
@@ -10,7 +12,8 @@ class Indicators:
         self.summarizing_indicators = ['Revenues',
                                        'SalesRevenueNet',
                                        'RevenueFromContractWithCustomerExcludingAssessedTax',
-                                       'NetIncomeLoss']
+                                       'NetIncomeLoss',
+                                       'ProfitLoss']
 
         self.not_summarizing_indicators = []
         self.coalesce = Coalesce()
@@ -33,7 +36,8 @@ class Indicators:
         self.units_dict = {'Revenues': currency,
                            'SalesRevenueNet': currency,
                            'RevenueFromContractWithCustomerExcludingAssessedTax': currency,
-                           'NetIncomeLoss': currency}
+                           'NetIncomeLoss': currency,
+                           'ProfitLoss': currency}
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
         self.valid_indicators = []
