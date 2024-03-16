@@ -2,9 +2,10 @@ class Coalesce:
     def __init__(self):
         self.ttm_revenue_coalesce = ['ttm_Revenues',
                                      'ttm_SalesRevenueNet',
-                                     'ttm_RevenueFromContractWithCustomerExcludingAssessedTax']  # obliczany tylko dla odmian ttm wskaznikow z listy
-        self.ttm_net_income_coalesce = ['NetIncomeLoss',
-                                        'ProfitLoss']
+                                     'ttm_RevenueFromContractWithCustomerExcludingAssessedTax',
+                                     'ttm_SalesRevenueGoodsNet']  # obliczany tylko dla odmian ttm wskaznikow z listy
+        self.ttm_net_income_coalesce = ['ttm_NetIncomeLoss',
+                                        'ttm_ProfitLoss']  # pamiętać o dodaniu ttm
 
 
 class Indicators:
@@ -12,6 +13,7 @@ class Indicators:
         self.summarizing_indicators = ['Revenues',
                                        'SalesRevenueNet',
                                        'RevenueFromContractWithCustomerExcludingAssessedTax',
+                                       'SalesRevenueGoodsNet',
                                        'NetIncomeLoss',
                                        'ProfitLoss']
 
@@ -27,15 +29,16 @@ class Indicators:
                                    'ttm_revenue_coalesce_growth_5y',
                                    'ttm_revenue_coalesce_growth_3y_avg',
                                    'ttm_revenue_coalesce_growth_5y_avg',
-                                   'ttm_NetIncomeLoss_growth_1y',
-                                   'ttm_NetIncomeLoss_growth_3y',
-                                   'ttm_NetIncomeLoss_growth_5y',
-                                   'ttm_NetIncomeLoss_growth_3y_avg',
-                                   'ttm_NetIncomeLoss_growth_5y_avg']
+                                   'ttm_net_income_coalesce_growth_1y',
+                                   'ttm_net_income_coalesce_growth_3y',
+                                   'ttm_net_income_coalesce_growth_5y',
+                                   'ttm_net_income_coalesce_growth_3y_avg',
+                                   'ttm_net_income_coalesce_growth_5y_avg']
 
         self.units_dict = {'Revenues': currency,
                            'SalesRevenueNet': currency,
                            'RevenueFromContractWithCustomerExcludingAssessedTax': currency,
+                           'SalesRevenueGoodsNet': currency,
                            'NetIncomeLoss': currency,
                            'ProfitLoss': currency}
 
