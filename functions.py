@@ -29,6 +29,23 @@ class TickerType:
         return mykey
 
 
+class Keeper:
+    def __init__(self):
+        self.tickers = []
+        self.indicators = []
+        self.indicators2 = []
+
+
+class KeeperCurrentStatus:
+    def __init__(self):
+        self.tickers = []
+        self.base_columns = ['Stock', 'date', 'end']
+        self.indicators = self.base_columns
+
+    def update_indicators(self, new_values):
+        self.indicators = self.base_columns + new_values
+
+
 def pandas_df_display_options():
     pd.reset_option('display.max_rows')
     pd.reset_option('display.max_columns')

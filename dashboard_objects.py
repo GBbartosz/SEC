@@ -12,8 +12,9 @@ def dd_indicators(obj_id, placeholder, all_indicators, initial_value):
 
 
 def link_style():
-    style = {'height': '3vh',
-             'background-color': 'blue',
+    style = {'minWidth': '10vh',
+             'height': '3vh',
+             'background-color': '#8763EE',
              'color': 'white',
              'border': '2px',
              'border-radius': '6px'}

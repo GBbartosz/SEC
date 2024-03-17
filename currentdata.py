@@ -21,14 +21,7 @@ def current_data(main_folder_path):
 
     current_df = current_df.drop(['Volume',
                                   'dividends',
-                                  'stock_splits',
-                                  'Revenues',
-                                  'SalesRevenueNet',
-                                  'RevenueFromContractWithCustomerExcludingAssessedTax',
-                                  'NetIncomeLoss',
-                                  'ttm_Revenues',
-                                  'ttm_SalesRevenueNet',
-                                  'ttm_RevenueFromContractWithCustomerExcludingAssessedTax'])
+                                  'stock_splits'])
     current_df = current_df.T
     current_df = current_df.rename_axis('Stock')
 

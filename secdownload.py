@@ -14,9 +14,9 @@ class IndicatorType:
         self.indicators = Indicators(currency)
         self.name = name
 
-        if self.name in self.indicators.summarizing_indicators:
+        if self.name in self.indicators.summarizing_indicators_to_download:
             self.summarizing = True
-        elif self.name in self.indicators.not_summarizing_indicators:
+        elif self.name in self.indicators.not_summarizing_indicators_to_download:
             self.summarizing = False
 
         self.units = self.indicators.units_dict[self.name]
@@ -119,7 +119,7 @@ def download_metrics(tict, ticker, cik, main_folder_path, headers, n):
     base_columns = ['end', 'year', 'quarter']
     indicators = Indicators()
     total_df = None
-    for indicator in indicators.indicators:
+    for indicator in indicators.indicators_to_download:
     #for indicator in [indicators.indicators[0]]:
         #print(indicator)
         ind_class = IndicatorType(indicator, currency_key)

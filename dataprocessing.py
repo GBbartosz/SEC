@@ -9,14 +9,6 @@ import plotly.graph_objects as go
 from indicator import Indicators
 
 
-def summarize_quarters_to_ttm_years(indicators, metricsdf):
-    metriccols = metricsdf.columns[3:]
-    for metriccol in metriccols:
-        if metriccol in indicators.summarizing_indicators:
-            metricsdf[f'ttm_{metriccol}'] = metricsdf[metriccol].rolling(window=4, min_periods=4).sum()
-    return metricsdf
-
-
 def coalesce(indicators, metricsdf):
     # petla po grupach coalesce z Indicators
     # sprawdza liczbę kolumn dla danego tickera które wchodza w sklad grupy
@@ -32,6 +24,18 @@ def coalesce(indicators, metricsdf):
             metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}'])
         if len(columns) == 4:
             metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}'])
+        if len(columns) == 5:
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}']).fillna(metricsdf[f'{columns[4]}'])
+        if len(columns) == 6:
+            metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}']).fillna(metricsdf[f'{columns[4]}']).fillna(metricsdf[f'{columns[5]}'])
+    return metricsdf
+
+
+def summarize_quarters_to_ttm_years(indicators, metricsdf):
+    metriccols = metricsdf.columns[3:]
+    for metriccol in metriccols:
+        if metriccol in indicators.summarizing_indicators:
+            metricsdf[f'ttm_{metriccol}'] = metricsdf[metriccol].rolling(window=4, min_periods=4).sum()
     return metricsdf
 
 
@@ -86,7 +90,7 @@ def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
 
     indicators.valid_indicators = [i for i in indicators.indicators if i in totaldf.columns]
     indicators.valid_ttm_indicators = [i for i in indicators.ttm_indicators if i in totaldf.columns]
-    ordered_columns = base_columns + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.coalesce_indicators + indicators.metrics_indicators
+    ordered_columns = base_columns + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.metrics_indicators
     totaldf = totaldf[ordered_columns]
     totaldf = totaldf.sort_values(by='date')
 
@@ -143,7 +147,7 @@ def fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, p
     # there are left values only for the end of quarters
     direct_join_df = pd.merge_asof(metricsdf, pricedf, left_on='end', right_on='date', direction='forward')[['end', 'date']]
     total_df = total_df.merge(direct_join_df, on=['date', 'end'], how='left', indicator=True)
-    columns_to_apply_nan = [c for c in base_columns if c not in ['date', 'close', 'Volume', 'dividends', 'stock_splits']] + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.coalesce_indicators + indicators.metrics_indicators
+    columns_to_apply_nan = [c for c in base_columns if c not in ['date', 'close', 'Volume', 'dividends', 'stock_splits']] + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.metrics_indicators
     total_df.loc[total_df['_merge'] == 'left_only', columns_to_apply_nan] = np.nan
     total_df = total_df.drop('_merge', axis=1)
     return total_df
@@ -169,8 +173,8 @@ def process_data(ticker, cik, main_folder_path):
     sharesdf = pd.read_csv(f'{metrics_folder_path}{ticker}_shares.csv')
     sharesdf['end'] = pd.to_datetime(sharesdf['end'])
 
-    metricsdf = summarize_quarters_to_ttm_years(indicators, metricsdf)
     metricsdf = coalesce(indicators, metricsdf)
+    metricsdf = summarize_quarters_to_ttm_years(indicators, metricsdf)
     metricsdf = correct_errors(metricsdf, ticker)
     metricsdf = calculate_metrics_indicators(indicators, metricsdf)
     total_df = create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf)

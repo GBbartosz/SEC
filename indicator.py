@@ -1,22 +1,42 @@
 class Coalesce:
     def __init__(self):
-        self.ttm_revenue_coalesce = ['ttm_Revenues',
-                                     'ttm_SalesRevenueNet',
-                                     'ttm_RevenueFromContractWithCustomerExcludingAssessedTax',
-                                     'ttm_SalesRevenueGoodsNet']  # obliczany tylko dla odmian ttm wskaznikow z listy
-        self.ttm_net_income_coalesce = ['ttm_NetIncomeLoss',
-                                        'ttm_ProfitLoss']  # pamiętać o dodaniu ttm
+        self.revenue_coalesce = ['Revenues',
+                                 'SalesRevenueNet',
+                                 'RevenueFromContractWithCustomerExcludingAssessedTax',
+                                 'SalesRevenueGoodsNet']
+        self.net_income_coalesce = ['NetIncomeLoss',
+                                    'ProfitLoss']
 
 
 class Indicators:
     def __init__(self, currency='USD'):
-        self.summarizing_indicators = ['Revenues',
-                                       'SalesRevenueNet',
-                                       'RevenueFromContractWithCustomerExcludingAssessedTax',
-                                       'SalesRevenueGoodsNet',
-                                       'NetIncomeLoss',
-                                       'ProfitLoss']
 
+        # used in downloading data from SEC
+        self.summarizing_indicators_to_download = ['Revenues',
+                                                   'SalesRevenueNet',
+                                                   'RevenueFromContractWithCustomerExcludingAssessedTax',
+                                                   'SalesRevenueGoodsNet',
+                                                   'NetIncomeLoss',
+                                                   'ProfitLoss']
+        self.not_summarizing_indicators_to_download = []
+        self.indicators_to_download = self.summarizing_indicators_to_download + self.not_summarizing_indicators_to_download
+        self.units_dict = {'Revenues': currency,
+                           'SalesRevenueNet': currency,
+                           'RevenueFromContractWithCustomerExcludingAssessedTax': currency,
+                           'SalesRevenueGoodsNet': currency,
+                           'NetIncomeLoss': currency,
+                           'ProfitLoss': currency}
+
+        # used in dataprocessing
+        self.summarizing_indicators = ['revenue_coalesce',
+                                       # 'Revenues',
+                                       # 'SalesRevenueNet',
+                                       # 'RevenueFromContractWithCustomerExcludingAssessedTax',
+                                       # 'SalesRevenueGoodsNet',
+                                       'net_income_coalesce'
+                                       # 'NetIncomeLoss',
+                                       # 'ProfitLoss'
+                                       ]
         self.not_summarizing_indicators = []
         self.coalesce = Coalesce()
         self.coalesce_indicators = list(self.coalesce.__dict__.keys())
@@ -34,13 +54,6 @@ class Indicators:
                                    'ttm_net_income_coalesce_growth_5y',
                                    'ttm_net_income_coalesce_growth_3y_avg',
                                    'ttm_net_income_coalesce_growth_5y_avg']
-
-        self.units_dict = {'Revenues': currency,
-                           'SalesRevenueNet': currency,
-                           'RevenueFromContractWithCustomerExcludingAssessedTax': currency,
-                           'SalesRevenueGoodsNet': currency,
-                           'NetIncomeLoss': currency,
-                           'ProfitLoss': currency}
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
         self.valid_indicators = []

@@ -6,16 +6,13 @@ from functions import TickerType, pandas_df_display_options, download_tickers_df
 from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
-# nowe wskazniki
-# second y axis
 # subdropdown
+# correlation
+# pca
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
-
 # Visa sahres nie do namierzenia
 # COST rozjazd net income i revenue - proba naprawy
-# NKE brak 2 dat w 2011
-# PFE najpierw coalesce, w drugiej kolejnosci summarizing - gdy dane kwartalne przeplataja sie summarizing liczy pelne lata i traci przez to oddzielone dane. Po połączeniu najpierw wypełnione byłyby luki (revenue case)
 
 # MCD prawdopodobnie co roku w grudniu raportuje shares w mln (dodac 2024 w sharepricedownload correct_errors jesli problem wystapi)
 
