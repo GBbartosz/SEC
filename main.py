@@ -1,6 +1,6 @@
 import pandas as pd
 
-from currentdata import current_data
+from advancedprocessing import current_data
 from dataprocessing import process_data
 from functions import TickerType, pandas_df_display_options, download_tickers_df
 from secdownload import download_metrics
@@ -8,6 +8,10 @@ from sharespricedownload import download_price_and_shares
 
 # subdropdown
 # correlation
+    # pearson spearman
+    # heatmap
+    # suwak czasowy
+    # uwaga na skrocone okresy porownan przez nan
 # pca
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione

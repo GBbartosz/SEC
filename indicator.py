@@ -81,4 +81,5 @@ class Indicators:
                                  'ttm_PSG_historical_3y',
                                  'ttm_PSG_historical_5y']
 
-        self.all_indicators = ['shares'] + self.price + self.ttm_indicators + self.coalesce_indicators + self.metrics_indicators + self.price_indicators
+        #self.all_indicators = ['shares'] + self.price + self.ttm_indicators + self.metrics_indicators + self.price_indicators
+        self.all_indicators = ['shares']
