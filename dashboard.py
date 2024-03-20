@@ -3,6 +3,7 @@ import os
 from app import app
 from indicator import Indicators
 from pagemain import main_page
+from pagecorrelation import correlation_page
 from pagecurrentdatatable import current_status
 
 
@@ -21,5 +22,6 @@ if __name__ == "__main__":
 
     main_page(indicators, tickers, main_folder_path)
     current_status(main_folder_path)
+    correlation_page(tickers, main_folder_path)
 
     app.run_server(debug=True)

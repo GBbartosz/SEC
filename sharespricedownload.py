@@ -26,6 +26,10 @@ def correct_errors(df, tic):
     elif tic == 'MCD':
         mapping = ['2021-12-31', '2022-12-31', '2023-12-31']
         df['shares'] = df.apply(lambda x: x['shares'] * 1000000 if x['end'] in pd.to_datetime(mapping) else x['shares'], axis=1)
+    elif tic == 'TXN':
+        mapping = ['2009-09-30', '2010-03-31']
+        df['shares'] = df.apply(lambda x: x['shares'] * 1000000 if x['end'] in pd.to_datetime(mapping) else x['shares'], axis=1)
+
     return df
 
 

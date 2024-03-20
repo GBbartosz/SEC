@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from datetime import timedelta
 from functions import pandas_df_display_options
 from indicator import Indicators
 
@@ -33,11 +34,16 @@ def current_data(main_folder_path):
 
 def correlation(main_folder_path):
     processed_folder_path = f'{main_folder_path}processed_data\\'
+    correlation_folder_path = f'{main_folder_path}correlation_data\\'
     files = os.listdir(processed_folder_path)
 
     indicators = Indicators()
+    period_years = [1, 2, 3, 5, 10, None]
+    year_window = 252
 
-    for indicator in [indicators.all_indicators[0]]:
+    #for indicator in [indicators.all_indicators[0]]:
+    for indicator in indicators.all_indicators:
+        indicator_for_csv_file_name = indicator.replace('/', '')
         print(indicator)
         values_df = None
         for f in files:
@@ -48,18 +54,39 @@ def correlation(main_folder_path):
 
             values_df = df if values_df is None else pd.merge(values_df, df, on='date', how='outer')
 
-        tickers = values_df.columns[1:]  # omitting dates
-        corr_df = pd.DataFrame(index=tickers, columns=tickers)
-        for tic1 in tickers:
-            for tic2 in tickers:
-                corr_calculation_df = values_df[[tic1, tic2]].dropna()
-                if tic1 != tic2:
-                    correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2])
-                else:
-                    correlation = 1
-                corr_df.loc[tic1, tic2] = correlation
+        values_df['date'] = pd.to_datetime(values_df['date'])
+        values_df = values_df.set_index('date')
+        tickers = values_df.columns  # omitting dates
 
-        print(corr_df)
+        for period_year in period_years:
+            corr_df = pd.DataFrame(index=tickers, columns=tickers)
+            for tic1 in tickers:
+                tic1_min_index = values_df[tic1].dropna().index.min()
+                tic1_max_index = values_df[tic1].dropna().index.max()
+                for tic2 in tickers:
+                    if tic1 != tic2:
+                        tic2_min_index = values_df[tic2].dropna().index.min()
+                        tic2_max_index = values_df[tic2].dropna().index.max()
+                        min_index = max(tic1_min_index, tic2_min_index)
+                        max_index = min(tic1_max_index, tic2_max_index)
+                        if period_year is None:  # correlation for all available values for both companies not nan
+                            corr_calculation_df = values_df[[tic1, tic2]][min_index:max_index]  # selecting period
+                            corr_calculation_df = corr_calculation_df.bfill()  # fulfilling nan values inbetween
+                            correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2])
+                        else:  # correlation for selected period
+                            period_ago = max_index - timedelta(days=period_year * 365)
+                            if period_ago >= min_index:
+                                corr_calculation_df = values_df[(values_df.index >= period_ago) & (values_df.index <= max_index)][[tic1, tic2]]  # selecting period
+                                corr_calculation_df = corr_calculation_df.bfill()  # fulfilling nan values inbetween
+                                correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2])
+                            else:  # available data is too short compared to demanded period
+                                correlation = None
+                    else:  # case when correlation AAPL: AAPL
+                        correlation = 1
+                    corr_df.loc[tic1, tic2] = correlation
+
+            corr_df.to_csv(f'{correlation_folder_path}correlation_{indicator_for_csv_file_name}_{period_year}.csv')
+
 
 pandas_df_display_options()
 main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'

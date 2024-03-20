@@ -30,7 +30,7 @@ if __name__ == '__main__':
     tict = TickerType()
     tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]
     print(tickers_df)
-    #tickers_df = tickers_df[tickers_df['ticker'] == 'PFE']
+    #tickers_df = tickers_df[tickers_df['ticker'] == 'TXN']
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
         cik = tickers_df['cik_str'][i]

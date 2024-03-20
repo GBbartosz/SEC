@@ -74,7 +74,8 @@ def main_page(indicators, tickers, main_folder_path):
     keeper = Keeper()
 
     layout_main_page = html.Div([
-        html.Div([dash_obj.page_link('CurrentDataLink', 'Current Data Table', '/current_data')],
+        html.Div([dash_obj.page_link('CurrentDataLink', 'Current Data Table', '/current_data'),
+                  dash_obj.page_link('CorrelationLink', 'Correlation', '/correlation')],
                  style={'height': '4vh'}),
         html.Div([
             html.Div([dash_obj.dd_indicators('dd_indicators', 'Select indicator (left y-axis)', indicators.all_indicators, None)], style={'width': '42%', 'display': 'inline-block', 'marginRight': '0.5%'}),

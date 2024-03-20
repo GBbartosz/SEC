@@ -11,6 +11,15 @@ def dd_indicators(obj_id, placeholder, all_indicators, initial_value):
     return obj
 
 
+def dd_single(obj_id, placeholder, all_values, initial_value):
+    obj = dcc.Dropdown(id=obj_id,
+                       placeholder=placeholder,
+                       options=all_values,
+                       value=initial_value,
+                       multi=False)
+    return obj
+
+
 def link_style():
     style = {'minWidth': '10vh',
              'height': '3vh',
