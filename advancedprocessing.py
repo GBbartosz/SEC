@@ -38,7 +38,7 @@ def correlation(main_folder_path):
     files = os.listdir(processed_folder_path)
 
     indicators = Indicators()
-    period_years = [1, 2, 3, 5, 10, None]
+    period_years = [1, 2, 3, 5, 10, 'all']
     year_window = 252
 
     #for indicator in [indicators.all_indicators[0]]:
@@ -69,7 +69,7 @@ def correlation(main_folder_path):
                         tic2_max_index = values_df[tic2].dropna().index.max()
                         min_index = max(tic1_min_index, tic2_min_index)
                         max_index = min(tic1_max_index, tic2_max_index)
-                        if period_year is None:  # correlation for all available values for both companies not nan
+                        if period_year == 'all':  # correlation for all available values for both companies not nan
                             corr_calculation_df = values_df[[tic1, tic2]][min_index:max_index]  # selecting period
                             corr_calculation_df = corr_calculation_df.bfill()  # fulfilling nan values inbetween
                             correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2])

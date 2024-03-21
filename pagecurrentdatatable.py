@@ -32,7 +32,6 @@ def current_status(main_folder_path):
         return res
 
     def ag_grid_table(df):
-        print([columns_property(c, df) for c in df.columns])
         table = ag.AgGrid(id='current_status_table',
                           rowData=df.to_dict('records'),
                           columnDefs=[columns_property(c, df) for c in df.columns],
@@ -50,7 +49,7 @@ def current_status(main_folder_path):
     keeper.tickers = current_df['Stock'].to_list()
 
     layout_current_status_page = html.Div([
-        html.Div([html.Div(dash_obj.page_link('MainPageLink', 'Main', '/'), style={'display': 'inline-block', 'textAlign': 'left'}),
+        html.Div([html.Div(dash_obj.page_link('MainPageLink', 'Main', '/'), style={'display': 'inline-block', 'textAlign': 'left', 'marginRight': '10px'}),
                   html.Div(html.Button('Refresh', id='refresh_button'), style={'display': 'inline-block', 'textAlign': 'right'})
                   ], style={'display': 'flex', 'justifyContent': 'space-between', 'height': '4vh', 'margin': '0'}),
         html.Div([html.Div(dash_obj.dd_indicators('dd_indicators', 'Select indicator', initial_columns, None), style={'width': '60%', 'display': 'inline-block'}),

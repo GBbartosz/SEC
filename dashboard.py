@@ -11,7 +11,7 @@ def read_files(my_main_folder_path):
     processed_folder_path = f'{my_main_folder_path}processed_data\\'
     files = os.listdir(processed_folder_path)
     tickers = [f[:f.find('_')] for f in files]
-    print(tickers)
+    #print(tickers)
     return tickers
 
 
