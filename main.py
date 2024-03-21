@@ -7,11 +7,7 @@ from secdownload import download_metrics
 from sharespricedownload import download_price_and_shares
 
 # subdropdown
-# correlation
-    # pearson spearman
-    # heatmap
-    # suwak czasowy
-    # uwaga na skrocone okresy porownan przez nan
+# correlation  - pierwszy kwartal przedluzyc o 30 dni w dol>?
 # pca
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
@@ -30,7 +26,7 @@ if __name__ == '__main__':
     tict = TickerType()
     tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]
     print(tickers_df)
-    #tickers_df = tickers_df[tickers_df['ticker'] == 'TXN']
+    tickers_df = tickers_df[tickers_df['ticker'] == 'TSLA']
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
         cik = tickers_df['cik_str'][i]

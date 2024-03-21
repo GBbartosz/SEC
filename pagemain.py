@@ -78,9 +78,9 @@ def main_page(indicators, tickers, main_folder_path):
                   dash_obj.page_link('CorrelationLink', 'Correlation', '/correlation')],
                  style={'height': '4vh'}),
         html.Div([
-            html.Div([dash_obj.dd_indicators('dd_indicators', 'Select indicator (left y-axis)', indicators.all_indicators, None)], style={'width': '42%', 'display': 'inline-block', 'marginRight': '0.5%'}),
-            html.Div([dash_obj.dd_indicators('dd_indicators2', 'Select indicator (right y-axis)', indicators.all_indicators, None)], style={'width': '42%', 'display': 'inline-block', 'marginRight': '0.5%'}),
-            html.Div([dash_obj.dd_indicators('dd_tickers', 'Select stock', tickers, None)], style={'width': '14%', 'display': 'inline-block'})
+            html.Div([dash_obj.dd_indicators('dd_indicators', 'Select indicator (left y-axis)', indicators.all_indicators, None)], style={'width': '34%', 'display': 'inline-block', 'marginRight': '0.5%'}),
+            html.Div([dash_obj.dd_indicators('dd_indicators2', 'Select indicator (right y-axis)', indicators.all_indicators, None)], style={'width': '34%', 'display': 'inline-block', 'marginRight': '0.5%'}),
+            html.Div([dash_obj.dd_indicators('dd_tickers', 'Select stock', tickers, None)], style={'width': '30%', 'display': 'inline-block'})
             ], style={'width': '100%', 'height': '6vh'}),
         html.Div([dcc.Graph(id='MainChart', style={'width': '100%', 'height': '88vh'})], style={'text-align': 'center'})
     ])

@@ -16,13 +16,14 @@ class CorrHMKeeper:
         self.tickers = tickers
         self.indicator = None
         self.period = 'all'
+        self.correlation_type = 'spearman'
 
 
 class HeatMap:
     def __init__(self, keeper):
         self.fig = None
         if keeper.indicator is not None:
-            df = pd.read_csv(f'{keeper.correlation_folder_path}correlation_{keeper.indicator}_{keeper.period}.csv', index_col=0)
+            df = pd.read_csv(f'{keeper.correlation_folder_path}correlation_{keeper.correlation_type}_{keeper.indicator}_{keeper.period}.csv', index_col=0)
             df = df.round(2)
             df = df.loc[keeper.tickers, keeper.tickers]
             self.fig = px.imshow(df,
@@ -113,9 +114,11 @@ def correlation_page(tickers, main_folder_path):
                 ], style={'height': '4vh', 'textAlign': 'left'}),
             html.Div([
                 html.Div([
-                    html.Div(html.Button('Refresh', id='refresh_button'), style={'width': '10vh', 'display': 'inline-block'}),
+                    html.Div(html.Button('Select All Tickers', id='refresh_tickers_button'), style={'width': '15vh', 'display': 'inline-block'}),
+                    html.Div(
+                        dash_obj.dd_single('dd_correlation_type', 'Select correlation type', ['pearson', 'spearman'], 'spearman'), style={'width': '25vh', 'display': 'inline-block', 'margin-left': '10px'}),
                     html.Div(dash_obj.dd_single('dd_heatmaps_number', 'Select number of displayed heatmaps', [1, 2, 3, 4], 1), style={'width': '25vh', 'display': 'inline-block', 'margin-left': '10px'})
-                    ], style={'width': '40vh'})
+                    ], style={'width': '80vh'})
                 ], style={'textAlign': 'right', 'fontSize': '12px'})
             ], style={'display': 'flex', 'justifyContent': 'space-between'}),
         html.Div(dash_obj.dd_indicators('dd_tickers1', 'Select ticker', tickers, None), style={'height': '4vh', 'fontSize': '12px'}),
@@ -136,6 +139,20 @@ def correlation_page(tickers, main_folder_path):
 
     @app.callback(
         Output(component_id='heatmap_layout_area', component_property='children', allow_duplicate=True),
+        Input(component_id='dd_correlation_type', component_property='value'),
+        prevent_initial_call=True
+    )
+    def selection_correlation_type(value):
+        if value is not None:
+            hma.keeper1.correlation_type = value
+            hma.keeper2.correlation_type = value
+            hma.keeper3.correlation_type = value
+            hma.keeper4.correlation_type = value
+            hma.update()
+        return hma.heatmap_layout_area
+
+    @app.callback(
+        Output(component_id='heatmap_layout_area', component_property='children', allow_duplicate=True),
         Input(component_id='dd_tickers1', component_property='value'),
         prevent_initial_call=True
     )
@@ -147,6 +164,23 @@ def correlation_page(tickers, main_folder_path):
             hma.keeper4.tickers = value
             hma.update()
         return hma.heatmap_layout_area
+
+    @app.callback(
+        [Output(component_id='heatmap_layout_area', component_property='children', allow_duplicate=True),
+         Output(component_id='dd_tickers1', component_property='value')],
+        Input(component_id='refresh_tickers_button', component_property='n_clicks'),
+        prevent_initial_call=True
+    )
+    def refresh_all_tickers(n_clicks):
+        if n_clicks is not None:
+            print('click')
+            hma.keeper1.tickers = tickers
+            hma.keeper2.tickers = tickers
+            hma.keeper3.tickers = tickers
+            hma.keeper4.tickers = tickers
+            print(tickers)
+            hma.update()
+        return hma.heatmap_layout_area, tickers
 
     # ###---###---###---###--- Indicators dropdowns ---###---###---###---###
     @app.callback(

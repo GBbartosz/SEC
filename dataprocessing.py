@@ -28,6 +28,7 @@ def coalesce(indicators, metricsdf):
             metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}']).fillna(metricsdf[f'{columns[4]}'])
         if len(columns) == 6:
             metricsdf[f'{attr}'] = metricsdf[f'{columns[0]}'].fillna(metricsdf[f'{columns[1]}']).fillna(metricsdf[f'{columns[2]}']).fillna(metricsdf[f'{columns[3]}']).fillna(metricsdf[f'{columns[4]}']).fillna(metricsdf[f'{columns[5]}'])
+
     return metricsdf
 
 
@@ -45,6 +46,14 @@ def correct_errors(df, tic):
     if tic == 'PFE':
         mapping = ['2021-12-31', '2022-04-03', '2022-07-03', '2022-10-02']
         df['ttm_revenue_coalesce'] = df.apply(lambda x: x['ttm_revenue_coalesce'] + 7652 if x['end'] in pd.to_datetime(mapping) else x['ttm_revenue_coalesce'], axis=1)
+
+    return df
+
+
+def round_values(df):
+    # round values to handle error when using in calculation infinite value for example 129.999999999999999999999999999 what returend nan
+
+    df['ttm_net_income_coalesce'] = df['ttm_net_income_coalesce'].round(6)
 
     return df
 
@@ -69,6 +78,10 @@ def calculate_metrics_indicators(indicators, metricsdf):
     metricsdf['ttm_revenue_coalesce_growth_5y_avg'] = round((metricsdf['ttm_revenue_coalesce'] / metricsdf['ttm_revenue_coalesce'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
 
     # Net Income
+    n = metricsdf['ttm_net_income_coalesce'][41]
+    p = metricsdf['ttm_net_income_coalesce'][29]
+    x = (metricsdf['ttm_net_income_coalesce'][41] / metricsdf['ttm_net_income_coalesce'][29]) ** (1/3) - 1
+
     metricsdf['ttm_net_income_coalesce_growth_1y'] = round(metricsdf['ttm_net_income_coalesce'] / metricsdf['ttm_net_income_coalesce'].shift(year_window * 1) - 1, 2)
     metricsdf['ttm_net_income_coalesce_growth_3y'] = round(metricsdf['ttm_net_income_coalesce'] / metricsdf['ttm_net_income_coalesce'].shift(year_window * 3) - 1, 2)
     metricsdf['ttm_net_income_coalesce_growth_5y'] = round(metricsdf['ttm_net_income_coalesce'] / metricsdf['ttm_net_income_coalesce'].shift(year_window * 5) - 1, 2)
@@ -93,7 +106,6 @@ def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
     ordered_columns = base_columns + indicators.valid_indicators + indicators.valid_ttm_indicators + indicators.metrics_indicators
     totaldf = totaldf[ordered_columns]
     totaldf = totaldf.sort_values(by='date')
-
     return totaldf
 
 
@@ -176,6 +188,7 @@ def process_data(ticker, cik, main_folder_path):
     metricsdf = coalesce(indicators, metricsdf)
     metricsdf = summarize_quarters_to_ttm_years(indicators, metricsdf)
     metricsdf = correct_errors(metricsdf, ticker)
+    metricsdf = round_values(metricsdf)
     metricsdf = calculate_metrics_indicators(indicators, metricsdf)
     total_df = create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf)
     total_df = calculate_price_indicators(indicators, total_df)
