@@ -47,13 +47,17 @@ class Indicators:
                                    'ttm_revenue_coalesce_growth_1y',
                                    'ttm_revenue_coalesce_growth_3y',
                                    'ttm_revenue_coalesce_growth_5y',
-                                   'ttm_revenue_coalesce_growth_3y_avg',
-                                   'ttm_revenue_coalesce_growth_5y_avg',
+                                   'Revenue_AAGR_3y',
+                                   'Revenue_AAGR_5y',
+                                   'Revenue_CAGR_3y',
+                                   'Revenue_CAGR_5y',
                                    'ttm_net_income_coalesce_growth_1y',
                                    'ttm_net_income_coalesce_growth_3y',
                                    'ttm_net_income_coalesce_growth_5y',
-                                   'ttm_net_income_coalesce_growth_3y_avg',
-                                   'ttm_net_income_coalesce_growth_5y_avg']
+                                   'Net_Income_AAGR_3y',
+                                   'Net_Income_AAGR_5y',
+                                   'Net_Income_CAGR_3y',
+                                   'Net_Income_CAGR_5y']
 
         self.indicators = self.summarizing_indicators + self.not_summarizing_indicators
         self.valid_indicators = []

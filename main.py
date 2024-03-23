@@ -1,6 +1,6 @@
 import pandas as pd
 
-from advancedprocessing import current_data
+from advancedprocessing import current_data, correlation
 from dataprocessing import process_data
 from functions import TickerType, pandas_df_display_options, download_tickers_df
 from secdownload import download_metrics
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     tict = TickerType()
     tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]
     print(tickers_df)
-    tickers_df = tickers_df[tickers_df['ticker'] == 'TSLA']
+    #tickers_df = tickers_df[tickers_df['ticker'] == 'TSLA']
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
         cik = tickers_df['cik_str'][i]
@@ -42,3 +42,4 @@ if __name__ == '__main__':
         n += 1
 
     current_data(main_folder_path)
+    correlation(main_folder_path)
