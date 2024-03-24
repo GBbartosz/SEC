@@ -23,7 +23,8 @@ class HeatMap:
     def __init__(self, keeper):
         self.fig = None
         if keeper.indicator is not None:
-            df = pd.read_csv(f'{keeper.correlation_folder_path}correlation_{keeper.correlation_type}_{keeper.indicator}_{keeper.period}.csv', index_col=0)
+            indicator_in_file_name = keeper.indicator.replace('/', '')
+            df = pd.read_csv(f'{keeper.correlation_folder_path}correlation_{keeper.correlation_type}_{indicator_in_file_name}_{keeper.period}.csv', index_col=0)
             df = df.round(2)
             df = df.loc[keeper.tickers, keeper.tickers]
             self.fig = px.imshow(df,
