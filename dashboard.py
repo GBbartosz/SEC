@@ -5,6 +5,7 @@ from indicator import Indicators
 from pagemain import main_page
 from pagecorrelation import correlation_page
 from pagecurrentdatatable import current_status
+from pagepca import page_pca
 
 
 def read_files(my_main_folder_path):
@@ -23,5 +24,6 @@ if __name__ == "__main__":
     main_page(indicators, tickers, main_folder_path)
     current_status(main_folder_path)
     correlation_page(tickers, main_folder_path)
+    page_pca(indicators, tickers, main_folder_path)
 
     app.run_server(debug=True)

@@ -49,8 +49,8 @@ def current_status(main_folder_path):
     keeper.tickers = current_df['Stock'].to_list()
 
     layout_current_status_page = html.Div([
-        html.Div([html.Div(dash_obj.page_link('MainPageLink', 'Main', '/'), style={'display': 'inline-block', 'textAlign': 'left', 'marginRight': '10px'}),
-                  html.Div(html.Button('Refresh', id='refresh_button'), style={'display': 'inline-block', 'textAlign': 'right'})
+        html.Div([dash_obj.navigation_menu(1),
+                  html.Div(html.Button('Refresh', id='refresh_button'), style={'display': 'inline-block', 'textAlign': 'right'}),
                   ], style={'display': 'flex', 'justifyContent': 'space-between', 'height': '4vh', 'margin': '0'}),
         html.Div([html.Div(dash_obj.dd_indicators('dd_indicators', 'Select indicator', initial_columns, None), style={'width': '60%', 'display': 'inline-block'}),
                   html.Div(dash_obj.dd_indicators('dd_tickers', 'Select ticker', current_df['Stock'].to_list(), None), style={'width': '40%', 'display': 'inline-block'})],

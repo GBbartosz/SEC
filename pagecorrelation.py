@@ -109,10 +109,7 @@ def correlation_page(tickers, main_folder_path):
 
     page_layout = html.Div([
         html.Div([
-            html.Div([
-                html.Div(dash_obj.page_link('MainPageLink', 'Main', '/'), style={'display': 'inline-block', 'marginRight': '10px'}),
-                html.Div(dash_obj.page_link('CurrentDataLink', 'Current Data Table', '/current_data'), style={'display': 'inline-block'})
-                ], style={'height': '4vh', 'textAlign': 'left'}),
+            dash_obj.navigation_menu(2),
             html.Div([
                 html.Div([
                     html.Div(html.Button('Select All Tickers', id='refresh_tickers_button'), style={'width': '15vh', 'display': 'inline-block'}),

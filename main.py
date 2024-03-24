@@ -13,6 +13,7 @@ from sharespricedownload import download_price_and_shares
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
 # Visa sahres nie do namierzenia
 # COST rozjazd net income i revenue - proba naprawy
+# DIS zduplikowane Q3 2020
 
 # MCD prawdopodobnie co roku w grudniu raportuje shares w mln (dodac 2024 w sharepricedownload correct_errors jesli problem wystapi)
 

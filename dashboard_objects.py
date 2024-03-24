@@ -1,5 +1,5 @@
 import dash
-from dash import dcc
+from dash import html, dcc
 
 
 def dd_indicators(obj_id, placeholder, all_indicators, initial_value):
@@ -21,19 +21,34 @@ def dd_single(obj_id, placeholder, all_values, initial_value):
     return obj
 
 
-def link_style():
+def link_style(disabled):
+    bg_color = 'black' if disabled else '#8763EE'
     style = {'minWidth': '10vh',
              'height': '3vh',
-             'background-color': '#8763EE',
+             'background-color': bg_color,
              'color': 'white',
              'border': '2px',
              'border-radius': '6px'}
     return style
 
 
-def page_link(obj_id, name, path):
-    obj = dash.dcc.Link(dash.html.Button(name, style=link_style()),
+def page_link(obj_id, name, path, disabled=False):
+    obj = dash.dcc.Link(dash.html.Button(name,
+                                         style=link_style(disabled),
+                                         disabled=disabled),
                         id=obj_id,
                         href=path,
                         refresh=True)
     return obj
+
+
+def navigation_menu(disabled_position):
+    clicable_elements = [False for e in list(range(4))]
+    clicable_elements[disabled_position] = True
+    page_link_html_style = {'display': 'inline-block', 'marginRight': '10px'}
+    nm = html.Div([html.Div(page_link('MainPageLink', 'Main', '/', disabled=clicable_elements[0]), style=page_link_html_style),
+              html.Div(page_link('CurrentDataLink', 'Current Data Table', '/current_data', disabled=clicable_elements[1]), style=page_link_html_style),
+              html.Div(page_link('CorrelationLink', 'Correlation', '/correlation', disabled=clicable_elements[2]), style=page_link_html_style),
+              html.Div(page_link('PCALink', 'PCA', '/pca', disabled=clicable_elements[3]), style=page_link_html_style)
+              ], style={'height': '4vh', 'display': 'inline-block', 'textAlign': 'left'})
+    return nm
