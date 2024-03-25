@@ -9,7 +9,7 @@ from dash.dependencies import Input, Output
 import dashboard_objects as dash_obj
 
 from app import app
-from functions import Keeper, plotly_lines, plotly_markers, ticker_color_dict
+from functions import Keeper, plotly_lines, plotly_markers, color_generator
 
 
 class MainChart:
@@ -22,10 +22,7 @@ class MainChart:
         for ticker in self.tickers:
             df = pd.read_csv(f'{self.processed_folder_path}{ticker}_processed.csv')
 
-            if ticker in ticker_color_dict.keys():
-                color = ticker_color_dict[ticker]
-            else:
-                color = f'rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})'
+            color = color_generator(ticker)
             pl = -1
             pm = -1
             for indicator in self.indicators:

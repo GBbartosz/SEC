@@ -1,5 +1,6 @@
-import requests
 import pandas as pd
+import random
+import requests
 
 
 class TickerType:
@@ -70,14 +71,22 @@ plotly_lines = ['solid', 'dash', 'dot', 'dashdot', 'longdash', 'longdashdot']
 
 plotly_markers = ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up', 'triangle-down', 'pentagon']
 
-ticker_color_dict = {'AAPL': 'green',
-                     'ADBE': '#FA0C00',
-                     'AMZN': '#FF9900',
-                     'GOOGL': '#EA4335',
-                     'META': '#0668E1',
-                     'MSFT': ' #66CC33',
-                     'NFLX': '#D81F26',
-                     'NVDA': '#76B900',
-                     'TSLA': '#E82127',
-                     'TSM': '#bb8f8f',
-                     'TXN': '#de538a'}
+
+def color_generator(ticker):
+    ticker_color_dict = {'AAPL': 'green',
+                         'ADBE': '#FA0C00',
+                         'AMZN': '#FF9900',
+                         'GOOGL': '#EA4335',
+                         'META': '#0668E1',
+                         'MSFT': ' #66CC33',
+                         'NFLX': '#D81F26',
+                         'NVDA': '#76B900',
+                         'TSLA': '#E82127',
+                         'TSM': '#bb8f8f',
+                         'TXN': '#de538a'}
+
+    if ticker in ticker_color_dict.keys():
+        color = ticker_color_dict[ticker]
+    else:
+        color = f'rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})'
+    return color

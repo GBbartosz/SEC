@@ -69,9 +69,9 @@ class HeatMapArea:
 
         heatmap_layout = html.Div([
             html.Div([
-                html.Div(dash_obj.dd_single(f'dd_indicators{i}', 'Select indicator', self.indicators.all_indicators, None),
+                html.Div(dash_obj.dd_single(f'dd_indicators{i}', 'Select indicator', self.indicators.all_indicators),
                          style={'display': 'inline-block', 'width': '40vh', 'height': '3vh', 'fontSize': '12px'}),
-                html.Div(dash_obj.dd_single(f'dd_periods{i}', 'Select period', self.periods, 'all'),
+                html.Div(dash_obj.dd_single(f'dd_periods{i}', 'Select period', self.periods),
                          style={'display': 'inline-block', 'width': '20vh', 'height': '3vh', 'fontSize': '12px'})
             ], style={'width': '60vh', 'height': '4vh'}),
             html.Div([graph_obj], style={'width': chart_width})

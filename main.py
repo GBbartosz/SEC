@@ -9,6 +9,8 @@ from sharespricedownload import download_price_and_shares
 # subdropdown
 # correlation  - pierwszy kwartal przedluzyc o 30 dni w dol>?
 # pca
+    # 3d graph for pca
+    # scatter for indicators
 
 # googl pierwszy kwartał q3 2014 jest wliczany to sumy 2015 q3 q2 q1, czyli brak 2014 q4, wyjasnic dlaczego  # chyba wyjasnione
 # Visa sahres nie do namierzenia
