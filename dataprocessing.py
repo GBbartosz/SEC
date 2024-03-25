@@ -138,8 +138,8 @@ def calculate_price_indicators(indicators, total_df):
     total_df['ttm_P/E_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
     # PEG
-    total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_P/E'] / (total_df['Net_Income_CAGR_3y'] * 100), 2)
-    total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_P/E'] / (total_df['Net_Income_CAGR_5y'] * 100), 2)
+    total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_P/E'] / (total_df['Net_Income_CAGR_3y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_P/E'] / (total_df['Net_Income_CAGR_5y'] * 100).replace(0, 1), 2)
 
     # P/S
     total_df['ttm_P/S'] = round(total_df['market_capitalization'] / total_df['ttm_revenue_coalesce'], 2)
@@ -149,8 +149,8 @@ def calculate_price_indicators(indicators, total_df):
     total_df['ttm_P/S_5y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
     # PSG - PEG for revenue
-    total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / (total_df['Revenue_CAGR_3y'] * 100), 2)
-    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / (total_df['Revenue_CAGR_5y'] * 100), 2)
+    total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / (total_df['Revenue_CAGR_3y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / (total_df['Revenue_CAGR_5y'] * 100).replace(0, 1), 2)
 
     return total_df
 
