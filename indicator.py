@@ -87,3 +87,12 @@ class Indicators:
 
         self.all_indicators = ['shares'] + self.price + self.ttm_indicators + self.metrics_indicators + self.price_indicators
         #self.all_indicators = ['shares']
+
+        self.alerts = ['Price < 3 year average',
+                       'Price < 5 year average',
+                       'ProfitMargin > 3 year average',
+                       'ProfitMargin > 5 year average',
+                       'P/E < 3 year average',
+                       'P/E < 5 year average',
+                       'P/S < 3 year average',
+                       'P/S < 5 year average']

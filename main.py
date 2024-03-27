@@ -1,6 +1,6 @@
 import pandas as pd
 
-from advancedprocessing import current_data, correlation
+from advancedprocessing import current_data, correlation, alerts_calculation
 from dataprocessing import process_data
 from functions import TickerType, pandas_df_display_options, download_tickers_df
 from secdownload import download_metrics
@@ -46,3 +46,4 @@ if __name__ == '__main__':
 
     current_data(main_folder_path)
     correlation(main_folder_path)
+    alerts_calculation(main_folder_path)

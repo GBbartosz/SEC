@@ -7,6 +7,7 @@ from pagemain import main_page
 from pagecorrelation import correlation_page
 from pagecurrentdatatable import current_status
 from pagepca import page_pca
+from pagealerts import page_alerts
 
 
 def read_files(my_main_folder_path):
@@ -27,5 +28,6 @@ if __name__ == "__main__":
     current_status(main_folder_path)
     correlation_page(tickers, main_folder_path)
     page_pca(tickers, main_folder_path)
+    page_alerts(main_folder_path)
 
     app.run_server(debug=True)

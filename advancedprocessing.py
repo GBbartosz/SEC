@@ -1,13 +1,10 @@
+import numpy as np
 import os
 import pandas as pd
 from datetime import timedelta
-from matplotlib import pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn import preprocessing
 from functions import pandas_df_display_options
 from indicator import Indicators
-import plotly.graph_objects as go
-import seaborn as sns
+
 
 def current_data(main_folder_path):
     processed_folder_path = f'{main_folder_path}processed_data\\'
@@ -93,8 +90,38 @@ def correlation(main_folder_path):
                 corr_df.to_csv(f'{correlation_folder_path}correlation_{correlation_type}_{indicator_for_csv_file_name}_{period_year}.csv')
 
 
+def alerts_calculation(main_folder_path):
+    # new alert metrics must be added to Indicators.alerts
+
+    def lower_than(series1, series2):
+        return 1 if series1 < series2 else np.nan
+
+    def higher_than(series1, series2):
+        return 1 if series1 > series2 else np.nan
+
+    indicators = Indicators()
+    df = pd.read_csv(f'{main_folder_path}current_data\\current_data.csv')
+
+    df['Price < 3 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_3y_avg']), axis=1)
+    df['Price < 5 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_5y_avg']), axis=1)
+    df['ProfitMargin > 3 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin_3y_avg']), axis=1)
+    df['ProfitMargin > 5 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin_5y_avg']), axis=1)
+    df['P/E < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_3y_avg']), axis=1)
+    df['P/E < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_5y_avg']), axis=1)
+    df['P/S < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/S'], x['ttm_P/S_3y_avg']), axis=1)
+    df['P/S < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_P/S'], x['ttm_P/S_5y_avg']), axis=1)
+
+    df['Total Score'] = df[indicators.alerts].sum(axis=1)
+
+    df = df[['Stock', 'date', 'end'] + indicators.alerts + ['Total Score']]
+    df = df.dropna(thresh=4).reset_index(drop=True)
+    df = df.replace(np.nan, 0)
+    df = df.sort_values('Total Score', ascending=False)
+    df.to_csv(f'{main_folder_path}current_data\\alerts_data.csv')
+
+
 #pandas_df_display_options()
 #main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
 ##current_data(main_folder_path)
 #correlation(main_folder_path)
-
+#alerts_calculation(main_folder_path)
