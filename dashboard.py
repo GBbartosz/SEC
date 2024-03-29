@@ -8,6 +8,7 @@ from pagecorrelation import correlation_page
 from pagecurrentdatatable import current_status
 from pagepca import page_pca
 from pagealerts import page_alerts
+from pagevaluation import page_valuation
 
 
 def read_files(my_main_folder_path):
@@ -29,5 +30,6 @@ if __name__ == "__main__":
     correlation_page(tickers, main_folder_path)
     page_pca(tickers, main_folder_path)
     page_alerts(main_folder_path)
+    page_valuation(main_folder_path)
 
     app.run_server(debug=True)

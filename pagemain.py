@@ -2,7 +2,6 @@ import dash
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import random
 from dash import dcc, html
 from dash.dependencies import Input, Output
 
