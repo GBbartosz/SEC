@@ -6,7 +6,7 @@ import plotly.express as px
 
 import dashboard_objects as dash_obj
 from app import app
-from indicator import Indicators
+from indicator2 import Indicators2
 
 
 class CorrHMKeeper:
@@ -96,7 +96,7 @@ class HeatMapArea:
 
 def correlation_page(tickers, main_folder_path):
     correlation_folder_path = f'{main_folder_path}correlation_data\\'
-    indicators = Indicators()
+    indicators = Indicators2()
     periods = [1, 2, 3, 5, 10, 'all']
     keeper1 = CorrHMKeeper(tickers, correlation_folder_path)
     keeper2 = CorrHMKeeper(tickers, correlation_folder_path)

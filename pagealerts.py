@@ -7,7 +7,7 @@ from matplotlib.colors import Normalize
 import matplotlib
 import dashboard_objects as dash_obj
 from dash.dependencies import Output, Input
-from indicator import Indicators
+from indicator2 import Indicators2
 from app import app
 
 
@@ -58,7 +58,7 @@ class AlertTable:
 
 def page_alerts(main_folder_path):
 
-    indicators = Indicators()
+    indicators = Indicators2()
     df = pd.read_csv(f'{main_folder_path}current_data\\alerts_data.csv', index_col=0)
     tickers = df['Stock'].tolist()
     alerttable = AlertTable(df, indicators)

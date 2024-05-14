@@ -13,7 +13,7 @@ from sklearn.decomposition import PCA
 from app import app
 import dashboard_objects as dash_obj
 from functions import color_generator
-from indicator import Indicators
+from indicator2 import Indicators2
 
 
 class KeeperPCA:
@@ -154,7 +154,7 @@ class IndicatorScatter:
 
 def page_pca(tickers, main_folder_path):
 
-    indicators = Indicators()
+    indicators = Indicators2()
 
     keeper1 = KeeperPCA(main_folder_path, tickers, indicators)
     keeper2 = KeeperPCA(main_folder_path, tickers, indicators)

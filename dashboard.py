@@ -2,7 +2,7 @@ import os
 
 from app import app
 from functions import pandas_df_display_options
-from indicator import Indicators
+from indicator2 import Indicators2
 from pagemain import main_page
 from pagecorrelation import correlation_page
 from pagecurrentdatatable import current_status
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     pandas_df_display_options()
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
     tickers = read_files(main_folder_path)
-    indicators = Indicators()
+    indicators = Indicators2()
 
     main_page(indicators, tickers, main_folder_path)
     current_status(main_folder_path)

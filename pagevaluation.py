@@ -1,5 +1,4 @@
 import dash
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html
@@ -8,7 +7,6 @@ from dash.dependencies import Input, Output
 import dashboard_objects as dash_obj
 
 from app import app
-from functions import Keeper, plotly_lines, plotly_markers, color_generator
 
 
 class Valuation:

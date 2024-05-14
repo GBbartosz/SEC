@@ -9,6 +9,7 @@ cik = '0001403161'  # visa
 cik = '0001141391'  # MA
 cik = '0001730168'  # AVGO
 cik = '0000078003'  # PFE
+cik = '0000909832'  # COST
 
 facts = requests.get(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json', headers=headers).json()
 factsl = []
