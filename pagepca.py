@@ -73,10 +73,10 @@ class PCACalculation:
                                       'dividends',
                                       'stock_splits',
                                       'close',
-                                      'Net_Income_AAGR_3y',
-                                      'Net_Income_AAGR_5y',
-                                      'Revenue_AAGR_3y',
-                                      'Revenue_AAGR_5y'], axis=1)
+                                      'NetIncomeAAGR3y',
+                                      'NetIncomeAAGR5y',
+                                      'RevenueAAGR3y',
+                                      'RevenueAAGR5y'], axis=1)
             total_df = total_df.dropna(axis=1)  # drop columns with any nan value
             self.total_df = total_df
 

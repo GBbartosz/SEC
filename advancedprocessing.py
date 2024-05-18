@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from datetime import timedelta
 from functions import pandas_df_display_options
-from indicator import Indicators
+from indicator2 import Indicators2
 
 
 def current_data(main_folder_path):
@@ -38,7 +38,7 @@ def correlation(main_folder_path):
     correlation_folder_path = f'{main_folder_path}correlation_data\\'
     files = os.listdir(processed_folder_path)
 
-    indicators = Indicators()
+    indicators = Indicators2()
     period_years = [1, 2, 3, 5, 10, 'all']
     year_window = 252
 
@@ -99,13 +99,13 @@ def alerts_calculation(main_folder_path):
     def higher_than(series1, series2):
         return 1 if series1 > series2 else np.nan
 
-    indicators = Indicators()
+    indicators = Indicators2()
     df = pd.read_csv(f'{main_folder_path}current_data\\current_data.csv')
 
     df['Price < 3 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_3y_avg']), axis=1)
     df['Price < 5 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_5y_avg']), axis=1)
-    df['ProfitMargin > 3 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin_3y_avg']), axis=1)
-    df['ProfitMargin > 5 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin_5y_avg']), axis=1)
+    df['ProfitMargin > 3 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin3yAvg']), axis=1)
+    df['ProfitMargin > 5 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin5yAvg']), axis=1)
     df['P/E < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_3y_avg']), axis=1)
     df['P/E < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_5y_avg']), axis=1)
     df['P/S < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/S'], x['ttm_P/S_3y_avg']), axis=1)

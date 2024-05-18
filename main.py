@@ -44,7 +44,8 @@ if __name__ == '__main__':
     tickers_df = add_manual_ticker_to_tickers_df(tickers_df, manual_tickers)
 
     print(tickers_df)
-    tickers_df = tickers_df[tickers_df['ticker'] == 'META']
+    #tickers_df = tickers_df[tickers_df['ticker'] == 'META']
+    tickers_df = tickers_df[tickers_df['ticker'].isin(['GOOGL', 'META'])]
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
     for i in tickers_df.index:
         cik = tickers_df['cik_str'][i]
@@ -59,6 +60,6 @@ if __name__ == '__main__':
 
         n += 1
 
-    #current_data(main_folder_path)
-    #correlation(main_folder_path)
-    #alerts_calculation(main_folder_path)
+    current_data(main_folder_path)
+    correlation(main_folder_path)
+    alerts_calculation(main_folder_path)
