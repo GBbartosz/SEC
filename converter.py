@@ -8,7 +8,18 @@ import pandas as pd
 # change ticker below
 # run script
 
-ticker = 'GOOGL'
+ticker = 'WMT'
+
+pd.reset_option('display.max_rows')
+pd.reset_option('display.max_columns')
+pd.reset_option('display.width')
+pd.reset_option('display.float_format')
+pd.reset_option('display.max_colwidth')
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', 40)
+pd.set_option('display.width', 400)
 
 
 def convert_number(x):
@@ -51,6 +62,11 @@ file_name = f'{ticker}_metrics_raw.csv'
 
 df = pd.read_csv(f'{converter_folder_path}{file_name}', sep=';')
 print(df.head())
+
+for c in df.columns:
+    if 'Unnamed' in c:
+        df = df.drop(c, axis=1)
+
 
 df[['month', 'day', 'year']] = df['end'].str.split(' ', expand=True)
 df['day'] = df['day'].str.replace(',', '')

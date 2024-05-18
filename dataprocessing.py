@@ -291,7 +291,7 @@ def fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, p
 #    #print(total_df)
 #    total_df.to_csv(f'{processed_folder_path}{ticker}_processed.csv', index=False)
 
-def process_data2(ticker, cik, main_folder_path):
+def process_data2(ticker, main_folder_path):
     indicators = Indicators2()
     base_columns = ['date', 'end', 'year', 'quarter', 'Shares', 'close', 'Volume', 'dividends', 'stock_splits']
     metrics_folder_path = f'{main_folder_path}metrics\\'

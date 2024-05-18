@@ -33,30 +33,32 @@ def add_manual_ticker_to_tickers_df(tdf, mtickers):
 if __name__ == '__main__':
     pandas_df_display_options()
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-    headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
-    tickers_df = download_tickers_df(headers)
-
+    #headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
+    #tickers_df = download_tickers_df(headers)
+    tickers = ['GOOGL', 'MA', 'META', 'PYPL', 'V', 'WMT']
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
-    tict = TickerType()
-    tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]
+    #tict = TickerType()
+    #tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]
 
-    manual_tickers = ['KER.PA']  # metrics and shares files created manually
-    tickers_df = add_manual_ticker_to_tickers_df(tickers_df, manual_tickers)
+    #manual_tickers = ['KER.PA']  # metrics and shares files created manually
+    #tickers_df = add_manual_ticker_to_tickers_df(tickers_df, manual_tickers)
 
-    print(tickers_df)
+    #print(tickers_df)
     #tickers_df = tickers_df[tickers_df['ticker'] == 'META']
-    tickers_df = tickers_df[tickers_df['ticker'].isin(['GOOGL', 'META'])]
+    #tickers_df = tickers_df[tickers_df['ticker'].isin(['GOOGL', 'META'])]
     n = 0  # jesli ==0 odpala funkcje printujaca opisy metrics
-    for i in tickers_df.index:
-        cik = tickers_df['cik_str'][i]
-        ticker = tickers_df['ticker'][i]
-        company_name = tickers_df['title'][i]
-        print(f'{ticker}: {cik}')
+    for ticker in tickers:
+    #for i in tickers_df.index:
+        #cik = tickers_df['cik_str'][i]
+        #ticker = tickers_df['ticker'][i]
+        #company_name = tickers_df['title'][i]
+        #print(f'{ticker}: {cik}')
+        print(ticker)
         #if cik is not None:  # don't download for manuals
         #    download_metrics(tict, ticker, cik, main_folder_path, headers, n)
         download_price_and_shares2(ticker, main_folder_path)
 
-        process_data2(ticker, cik, main_folder_path)
+        process_data2(ticker, main_folder_path)
 
         n += 1
 
