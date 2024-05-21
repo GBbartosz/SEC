@@ -35,7 +35,32 @@ if __name__ == '__main__':
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
     #headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
     #tickers_df = download_tickers_df(headers)
-    tickers = ['GOOGL', 'MA', 'META', 'PYPL', 'V', 'WMT']
+
+    tickers = ['AAPL',
+               'ADBE',
+               'ALB',
+               'AMZN',
+               'AVGO',
+               'COST',
+               'CRM',
+               'GOOGL',
+               'JNJ',
+               'KO',
+               'LLY',
+               'MA',
+               'MCD',
+               'META',
+               'MP',
+               'MSFT',
+               'NFLX',
+               'NVDA',
+               'NVO',
+               'PEP',
+               'PYPL',
+               'TSLA',
+               'V',
+               'WMT']
+
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
     #tict = TickerType()
     #tickers_df = tickers_df[tickers_df['ticker'].isin(tict.tickers)]

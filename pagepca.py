@@ -171,6 +171,7 @@ def page_pca(tickers, main_folder_path):
         html.Div([
             html.Div([
                 html.Div(dash_obj.dd_single('dd_period_1', 'Select Period', keeper1.periods)),
+                #html.Div(dash_obj.dd_indicators('dd_indicators_1', 'Select Indicators', keeper1.indicators, [None])),
                 html.Div([dcc.Graph(id='scree_plot_1')], style={'height': div_scree_height}),
                 html.Div(dcc.Graph(id='component_heatmap_1'), style={'height': div_heatmap_height}),
                 html.Div(dcc.Graph(id='pca_scatter_1'), style={'textAligh': 'center'}),
@@ -237,6 +238,24 @@ def page_pca(tickers, main_folder_path):
             heatmap2 = PCAHeatMap(mypca2)
             pcascatter2 = PCAScatter(mypca2)
         return screeplot2.fig, heatmap2.fig, pcascatter2.fig
+
+    #@app.callback(
+    #    [Output(component_id='scree_plot_1', component_property='figure', allow_duplicate=True),
+    #     Output(component_id='component_heatmap_1', component_property='figure', allow_duplicate=True),
+    #     Output(component_id='pca_scatter_1', component_property='figure', allow_duplicate=True)],
+    #    Input(component_id='dd_indicators_1', component_property='value'),
+    #    prevent_initial_call=True
+    #)
+    #def dropdown_selection_indicators_1(value):
+    #    nonlocal keeper1, mypca1
+    #    if value is not None:
+    #        print('xxx')
+    #        keeper1.indicators = [value]
+    #        mypca1 = PCACalculation(keeper1)
+    #        screeplot1 = ScreePlot(keeper1, mypca1)
+    #        heatmap1 = PCAHeatMap(mypca1)
+    #        pcascatter1 = PCAScatter(mypca1)
+    #    return screeplot1.fig, heatmap1.fig, pcascatter1.fig
 
     @app.callback(
         Output(component_id='indicator_scatter_1', component_property='figure'),

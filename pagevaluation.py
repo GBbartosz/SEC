@@ -28,8 +28,8 @@ class Valuation:
 
     def net_income_growth_valuation_calculation(self):
         if all(p is not None for p in [self.predicted_pe, self.predicted_cagr, self.predicted_period]):
-            future_net_income = self.df['ttm_net_income_coalesce'] * ((self.predicted_cagr + 1) ** self.predicted_period)
-            future_eps = future_net_income / self.df['shares']
+            future_net_income = self.df['ttm_NetIncome'] * ((self.predicted_cagr + 1) ** self.predicted_period)
+            future_eps = future_net_income / self.df['Shares']
             self.net_income_growth_valuation_result = (self.predicted_pe * future_eps).round(2)
             self.net_income_growth_valuation_change = (self.net_income_growth_valuation_result / self.df['close'] - 1).round(3)
         else:
@@ -108,7 +108,7 @@ def page_valuation(main_folder_path):
             print(value)
             valuation.select_ticker(value)
             pm_pe_table = valuation.pm_graph_obj(['ttm_P/E', 'ttm_P/E_1y_avg', 'ttm_P/E_3y_avg', 'ttm_P/E_5y_avg'])
-            pm_cagr_table = valuation.pm_graph_obj(['Net_Income_CAGR_3y', 'Net_Income_CAGR_5y'])
+            pm_cagr_table = valuation.pm_graph_obj(['NetIncomeCAGR3y', 'NetIncomeCAGR5y'])
             return valuation.ticker, valuation.df['close'], pm_pe_table, pm_cagr_table
 
     @app.callback(

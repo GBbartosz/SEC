@@ -8,7 +8,7 @@ import pandas as pd
 # change ticker below
 # run script
 
-ticker = 'WMT'
+ticker = 'PEP'
 
 pd.reset_option('display.max_rows')
 pd.reset_option('display.max_columns')
@@ -23,6 +23,7 @@ pd.set_option('display.width', 400)
 
 
 def convert_number(x):
+    x = str(x)
     if ',' in x:
         x = float(x.replace(',', '.')) * 1000
     else:
