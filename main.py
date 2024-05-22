@@ -36,30 +36,32 @@ if __name__ == '__main__':
     #headers = {'User-Agent': 'bartosz.grygalewicz@gmail.com'}
     #tickers_df = download_tickers_df(headers)
 
-    tickers = ['AAPL',
-               'ADBE',
-               'ALB',
-               'AMZN',
-               'AVGO',
-               'COST',
-               'CRM',
-               'GOOGL',
-               'JNJ',
-               'KO',
-               'LLY',
-               'MA',
-               'MCD',
-               'META',
-               'MP',
-               'MSFT',
-               'NFLX',
-               'NVDA',
-               'NVO',
-               'PEP',
-               'PYPL',
-               'TSLA',
-               'V',
-               'WMT']
+    tickers_df = pd.read_excel(f'{main_folder_path}tickers_data.xlsx')
+    tickers = tickers_df['ticker'].tolist()
+    #tickers = ['AAPL',
+    #           'ADBE',
+    #           'ALB',
+    #           'AMZN',
+    #           'AVGO',
+    #           'COST',
+    #           'CRM',
+    #           'GOOGL',
+    #           'JNJ',
+    #           'KO',
+    #           'LLY',
+    #           'MA',
+    #           'MCD',
+    #           'META',
+    #           'MP',
+    #           'MSFT',
+    #           'NFLX',
+    #           'NVDA',
+    #           'NVO',
+    #           'PEP',
+    #           'PYPL',
+    #           'TSLA',
+    #           'V',
+    #           'WMT']
 
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
     #tict = TickerType()

@@ -74,30 +74,8 @@ plotly_markers = ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up', 't
 
 def color_generator(ticker):
 
-    ticker_color_dict = {'AAPL': '#A2AAAD',
-                         'ADBE': '#FF0000',
-                         'ALB': '#52B595',
-                         'AMZN': '#FF9900',
-                         'AVGO': '#CC092F',
-                         'COST': '#E32A36',
-                         'CRM': '#00A1E0',
-                         'GOOGL': '#EA4335',
-                         'JNJ': '#D71600',
-                         'KO': '#DA1E2C',
-                         'LLY': '#D52B1E',
-                         'MA': '#FF5F00',
-                         'MCD': '#FFCC00',
-                         'META': '#0081FB',
-                         'MP': '#5C5C9C',
-                         'MSFT': '#7EB900',
-                         'NFLX': '#B20710',
-                         'NVDA': '#76B900',
-                         'NVO': '#001965',
-                         'PEP': '#28458E',
-                         'PYPL': '#009cde',
-                         'TSLA': '#E31937',
-                         'V': '#1A1F71',
-                         'WMT': '#ffc220'}
+    ticker_color_df = pd.read_excel('C:\\Users\\barto\\Desktop\\SEC2024\\tickers_data.xlsx')[['ticker', 'color']]
+    ticker_color_dict = ticker_color_df.set_index('ticker')['color'].to_dict()
 
     if ticker in ticker_color_dict.keys():
         color = ticker_color_dict[ticker]
