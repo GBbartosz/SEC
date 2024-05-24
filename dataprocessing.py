@@ -124,9 +124,12 @@ def calculate_metrics_indicators2(metricsdf):
     metricsdf['NetIncomeAAGR3y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3)) / 3 - 1, 2)
     metricsdf['NetIncomeAAGR5y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3) + metricsdf['ttm_NetIncome'].shift(year_window * 3) / metricsdf['ttm_NetIncome'].shift(year_window * 4) + metricsdf['ttm_NetIncome'].shift(year_window * 4) / metricsdf['ttm_NetIncome'].shift(year_window * 5)) / 5 - 1, 2)
 
-    metricsdf['NetIncomeCAGR3y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 3)) ** (1 / 3) - 1, 2)
-    metricsdf['NetIncomeCAGR5y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
-
+    metricsdf['calc_growth_3y'] = (metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 3))
+    metricsdf['calc_growth_3y'] = metricsdf['calc_growth_3y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
+    metricsdf['NetIncomeCAGR3y'] = metricsdf['calc_growth_3y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 3) - 1, 2))
+    metricsdf['calc_growth_5y'] = (metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 5))
+    metricsdf['calc_growth_5y'] = metricsdf['calc_growth_5y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
+    metricsdf['NetIncomeCAGR5y'] = metricsdf['calc_growth_5y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 5) - 1, 2))
     return metricsdf
 
 #def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
@@ -211,6 +214,7 @@ def calculate_price_indicators2(total_df):
     min_year_window = 248
 
     # Price
+    total_df['PriceChangeDaily'] = round(total_df['close'] / total_df['close'].shift(1) - 1, 2)
     total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)

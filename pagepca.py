@@ -16,11 +16,17 @@ from functions import color_generator
 from indicator2 import Indicators2
 
 
+class DummyFig:
+    def __init__(self):
+        self.fig = go.Figure()
+
+
 class KeeperPCA:
     def __init__(self, main_folder_path, tickers, indicators):
         self.main_folder_path = main_folder_path
         self.tickers = tickers
         self.indicators = indicators
+        self.pca_indicators = None
         self.indicator1 = None
         self.indicator2 = None
 
@@ -33,7 +39,7 @@ class PCACalculation:
     def __init__(self, keeper):
         self.keeper = keeper
 
-        if self.keeper.period is not None:
+        if self.keeper.period is not None and len(self.keeper.pca_indicators) > 1:
             processed_folder_path = f'{self.keeper.main_folder_path}processed_data\\'
             files = os.listdir(processed_folder_path)
             total_df = None
@@ -66,26 +72,14 @@ class PCACalculation:
                         total_df = pd.concat([total_df, df])
 
             self.all_indicators_df = total_df.copy()
-            total_df = total_df.drop(['date',
-                                      'end',
-                                      'year',
-                                      'quarter',
-                                      'dividends',
-                                      'stock_splits',
-                                      'close',
-                                      'NetIncomeAAGR3y',
-                                      'NetIncomeAAGR5y',
-                                      'RevenueAAGR3y',
-                                      'RevenueAAGR5y'], axis=1)
-            total_df = total_df.dropna(axis=1)  # drop columns with any nan value
+            total_df = total_df[keeper.pca_indicators]
+            total_df = total_df.dropna(axis=0)  # drop tickers with any nan value
             self.total_df = total_df
 
             scaler = preprocessing.StandardScaler()
-            print(total_df)
             scaled_df = scaler.fit_transform(total_df)
             self.pca = PCA()
             self.X = self.pca.fit_transform(scaled_df)
-            print(self.X)
 
 
 class ScreePlot:
@@ -162,6 +156,10 @@ def page_pca(tickers, main_folder_path):
     mypca1 = PCACalculation(keeper1)
     mypca2 = PCACalculation(keeper2)
 
+    screeplot1 = DummyFig()
+    heatmap1 = DummyFig()
+    pcascatter1 = DummyFig()
+
     div_scree_height = '50vh'
     div_heatmap_height = '900'
     div_pca_scatter_height = '80vh'
@@ -171,7 +169,7 @@ def page_pca(tickers, main_folder_path):
         html.Div([
             html.Div([
                 html.Div(dash_obj.dd_single('dd_period_1', 'Select Period', keeper1.periods)),
-                #html.Div(dash_obj.dd_indicators('dd_indicators_1', 'Select Indicators', keeper1.indicators, [None])),
+                html.Div(dash_obj.dd_indicators('dd_pca_indicators_1', 'Select Indicators', keeper1.indicators.all_indicators, None)),
                 html.Div([dcc.Graph(id='scree_plot_1')], style={'height': div_scree_height}),
                 html.Div(dcc.Graph(id='component_heatmap_1'), style={'height': div_heatmap_height}),
                 html.Div(dcc.Graph(id='pca_scatter_1'), style={'textAligh': 'center'}),
@@ -213,14 +211,19 @@ def page_pca(tickers, main_folder_path):
         prevent_initial_call=True
     )
     def dropdown_selection_period_1(value):
-        nonlocal keeper1, mypca1
+        nonlocal keeper1, mypca1, screeplot1, heatmap1, pcascatter1
         if value is not None:
             keeper1.period = value
-            mypca1 = PCACalculation(keeper1)
-            screeplot1 = ScreePlot(keeper1, mypca1)
-            heatmap1 = PCAHeatMap(mypca1)
-            pcascatter1 = PCAScatter(mypca1)
+            if keeper1.pca_indicators is not None:
+                if len(keeper1.pca_indicators) > 1:
+                    print('in period')
+                    mypca1 = PCACalculation(keeper1)
+                    screeplot1 = ScreePlot(keeper1, mypca1)
+                    heatmap1 = PCAHeatMap(mypca1)
+                    pcascatter1 = PCAScatter(mypca1)
+        print(screeplot1.fig)
         return screeplot1.fig, heatmap1.fig, pcascatter1.fig
+
 
     @app.callback(
         [Output(component_id='scree_plot_2', component_property='figure'),
@@ -239,23 +242,26 @@ def page_pca(tickers, main_folder_path):
             pcascatter2 = PCAScatter(mypca2)
         return screeplot2.fig, heatmap2.fig, pcascatter2.fig
 
-    #@app.callback(
-    #    [Output(component_id='scree_plot_1', component_property='figure', allow_duplicate=True),
-    #     Output(component_id='component_heatmap_1', component_property='figure', allow_duplicate=True),
-    #     Output(component_id='pca_scatter_1', component_property='figure', allow_duplicate=True)],
-    #    Input(component_id='dd_indicators_1', component_property='value'),
-    #    prevent_initial_call=True
-    #)
-    #def dropdown_selection_indicators_1(value):
-    #    nonlocal keeper1, mypca1
-    #    if value is not None:
-    #        print('xxx')
-    #        keeper1.indicators = [value]
-    #        mypca1 = PCACalculation(keeper1)
-    #        screeplot1 = ScreePlot(keeper1, mypca1)
-    #        heatmap1 = PCAHeatMap(mypca1)
-    #        pcascatter1 = PCAScatter(mypca1)
-    #    return screeplot1.fig, heatmap1.fig, pcascatter1.fig
+    @app.callback(
+        [Output(component_id='scree_plot_1', component_property='figure', allow_duplicate=True),
+         Output(component_id='component_heatmap_1', component_property='figure', allow_duplicate=True),
+         Output(component_id='pca_scatter_1', component_property='figure', allow_duplicate=True)],
+        Input(component_id='dd_pca_indicators_1', component_property='value'),
+        prevent_initial_call=True
+    )
+    def dropdown_selection_pca_indicators_1(value):
+        nonlocal keeper1, mypca1, screeplot1, heatmap1, pcascatter1
+        if value is not None:
+            keeper1.pca_indicators = value
+            if len(value) > 1 and keeper1.period is not None:
+                print('inside pca indicators')
+                mypca1 = PCACalculation(keeper1)
+                screeplot1 = ScreePlot(keeper1, mypca1)
+                heatmap1 = PCAHeatMap(mypca1)
+                pcascatter1 = PCAScatter(mypca1)
+        print(screeplot1.fig)
+        return screeplot1.fig, heatmap1.fig, pcascatter1.fig
+
 
     @app.callback(
         Output(component_id='indicator_scatter_1', component_property='figure'),

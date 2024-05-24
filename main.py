@@ -38,30 +38,7 @@ if __name__ == '__main__':
 
     tickers_df = pd.read_excel(f'{main_folder_path}tickers_data.xlsx')
     tickers = tickers_df['ticker'].tolist()
-    #tickers = ['AAPL',
-    #           'ADBE',
-    #           'ALB',
-    #           'AMZN',
-    #           'AVGO',
-    #           'COST',
-    #           'CRM',
-    #           'GOOGL',
-    #           'JNJ',
-    #           'KO',
-    #           'LLY',
-    #           'MA',
-    #           'MCD',
-    #           'META',
-    #           'MP',
-    #           'MSFT',
-    #           'NFLX',
-    #           'NVDA',
-    #           'NVO',
-    #           'PEP',
-    #           'PYPL',
-    #           'TSLA',
-    #           'V',
-    #           'WMT']
+    #tickers = ['MP']
 
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
     #tict = TickerType()
@@ -89,6 +66,6 @@ if __name__ == '__main__':
 
         n += 1
 
-    current_data(main_folder_path)
-    correlation(main_folder_path)
-    alerts_calculation(main_folder_path)
+    #current_data(main_folder_path)
+    #correlation(main_folder_path)
+    #alerts_calculation(main_folder_path)
