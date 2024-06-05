@@ -60,12 +60,12 @@ if __name__ == '__main__':
         print(ticker)
         #if cik is not None:  # don't download for manuals
         #    download_metrics(tict, ticker, cik, main_folder_path, headers, n)
-        download_price_and_shares2(ticker, main_folder_path)
 
-        process_data2(ticker, main_folder_path)
+        ##download_price_and_shares2(ticker, main_folder_path)
+        ##process_data2(ticker, main_folder_path)
 
         n += 1
 
     #current_data(main_folder_path)
-    #correlation(main_folder_path)
-    #alerts_calculation(main_folder_path)
+    correlation(main_folder_path)
+    alerts_calculation(main_folder_path)

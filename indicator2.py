@@ -68,3 +68,10 @@ class Indicators2:
                        'P/E < 5 year average',
                        'P/S < 3 year average',
                        'P/S < 5 year average']
+
+        self.correlation_indicators_daily = ['PriceChangeDaily',
+                                             'ttm_P/S',
+                                             'ttm_P/E']
+
+        self.correlation_indicators_quarterly = ['ttm_RevenueGrowth1y',
+                                                 'ttm_NetIncomeGrowth1y']

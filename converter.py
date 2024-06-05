@@ -8,7 +8,7 @@ import pandas as pd
 # change ticker below
 # run script
 
-ticker = 'NVDA'
+ticker = 'CMG'
 
 pd.reset_option('display.max_rows')
 pd.reset_option('display.max_columns')
