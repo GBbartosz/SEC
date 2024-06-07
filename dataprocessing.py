@@ -97,6 +97,17 @@ def summarize_quarters_to_ttm_years(indicators, metricsdf):
 def calculate_metrics_indicators2(metricsdf):
     # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
+    def calculate_change(mydf, col_name, years_num):
+        shifted_value = mydf[col_name].shift(year_window * years_num)
+        current_value = mydf[col_name]
+
+        res = np.where(
+            shifted_value == 0,
+            np.where(current_value > 0, 1, np.where(current_value < 0, -1, 0)),  # if shifted value == 0
+            round(current_value / shifted_value - 1, 2)  # if shifted_value != 0
+        )
+        return res
+
     year_window = 4
 
     # Profit Margin
@@ -117,9 +128,9 @@ def calculate_metrics_indicators2(metricsdf):
     metricsdf['RevenueCAGR5y'] = round((metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
 
     # Net Income
-    metricsdf['ttm_NetIncomeGrowth1y'] = round(metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) - 1, 2)
-    metricsdf['ttm_NetIncomeGrowth3y'] = round(metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 3) - 1, 2)
-    metricsdf['ttm_NetIncomeGrowth5y'] = round(metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 5) - 1, 2)
+    metricsdf['ttm_NetIncomeGrowth1y'] = calculate_change(metricsdf, 'ttm_NetIncome', 1)
+    metricsdf['ttm_NetIncomeGrowth3y'] = calculate_change(metricsdf, 'ttm_NetIncome', 2)
+    metricsdf['ttm_NetIncomeGrowth5y'] = calculate_change(metricsdf, 'ttm_NetIncome', 3)
 
     metricsdf['NetIncomeAAGR3y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3)) / 3 - 1, 2)
     metricsdf['NetIncomeAAGR5y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3) + metricsdf['ttm_NetIncome'].shift(year_window * 3) / metricsdf['ttm_NetIncome'].shift(year_window * 4) + metricsdf['ttm_NetIncome'].shift(year_window * 4) / metricsdf['ttm_NetIncome'].shift(year_window * 5)) / 5 - 1, 2)
@@ -227,7 +238,7 @@ def calculate_price_indicators2(total_df):
     total_df['market_capitalization_growth_5y'] = round(total_df['market_capitalization'] / total_df['market_capitalization'].shift(year_window * 5) - 1, 2)
 
     # P/E
-    total_df['ttm_P/E'] = round(total_df['market_capitalization'] / total_df['ttm_NetIncome'], 2)
+    total_df['ttm_P/E'] = np.where(total_df['ttm_NetIncome'] > 0, round(total_df['market_capitalization'] / total_df['ttm_NetIncome'], 2), 0)
 
     total_df['ttm_P/E_1y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['ttm_P/E_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)

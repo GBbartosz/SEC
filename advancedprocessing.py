@@ -35,7 +35,11 @@ def current_data(main_folder_path):
 
 def correlation(main_folder_path):
 
-    def safe_correlation_matrix(values_df):
+    def detect_error(mydf):
+        if len(list(mydf.index)) != len(list(set(mydf.index))):
+            print('ERROR! Duplicates in some metrics file!')
+
+    def safe_correlation_matrix(values_df, data_time_period_type):
 
         tickers = values_df.columns
 
@@ -56,18 +60,28 @@ def correlation(main_folder_path):
                                 #corr_calculation_df = corr_calculation_df.bfill()  # fulfilling nan values inbetween
                                 correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2], method=correlation_type)
                             else:  # correlation for selected period
-                                period_ago = max_index - timedelta(days=period_year * 365)
+
+                                if data_time_period_type == 'daily':
+                                    period_ago = max_index - timedelta(days=period_year * 365)
+                                elif data_time_period_type == 'quarterly':
+                                    period_ago = (max_index[0] - period_year, max_index[1])
+
                                 if period_ago >= min_index:
                                     corr_calculation_df = values_df[(values_df.index >= period_ago) & (values_df.index <= max_index)][[tic1, tic2]]  # selecting period
-                                    corr_calculation_df = corr_calculation_df.bfill()  # fulfilling nan values inbetween
+                                    corr_calculation_df = corr_calculation_df.bfill() if data_time_period_type == 'daily' else corr_calculation_df  # fulfilling nan values inbetween
                                     correlation = corr_calculation_df[tic1].corr(corr_calculation_df[tic2], method=correlation_type)
                                 else:  # available data is too short compared to demanded period
                                     correlation = None
                         else:  # case when correlation AAPL: AAPL
-                            correlation = 1
+                            correlation = None
                         corr_df.loc[tic1, tic2] = correlation
 
-                corr_df.to_csv(f'{correlation_folder_path}correlation_{correlation_type}_{indicator_for_csv_file_name}_{period_year}.csv')
+                corr_df = corr_df.dropna(how='all')  # drop rows and columns with not enough data to calculate correlation
+                corr_df = corr_df.astype(float).fillna(1)  # fill 1 for nan where AAPL: AAPL
+
+                file_name = f'{correlation_folder_path}correlation_{correlation_type}_{indicator_for_csv_file_name}_{period_year}'
+                print(file_name)
+                corr_df.to_csv(f'{file_name}.csv')
 
     processed_folder_path = f'{main_folder_path}processed_data\\'
     correlation_folder_path = f'{main_folder_path}correlation_data\\'
@@ -75,31 +89,22 @@ def correlation(main_folder_path):
 
     indicators = Indicators2()
     period_years = [1, 2, 3, 5, 10, 'all']
-    year_window = 252
 
-    correlation_indicators_all = indicators.correlation_indicators_daily + indicators.correlation_indicators_quarterly
-
-    for indicator in indicators.correlation_indicators_quarterly:
+    for indicator in indicators.correlation_indicators_quarterly[1:]:
         indicator_for_csv_file_name = indicator.replace('/', '')
-        print(indicator)
         values_df = None
         for f in files:
             ticker = f[:f.find('_')]
             df = pd.read_csv(f'{processed_folder_path}{f}')[['year', 'quarter', indicator]]
             df = df.rename(columns={indicator: ticker})
             df = df.dropna(axis=0, how='any')  # calculating correlation only on quarterly data
-            print(ticker)
-
-            # ERROR NA ŁĄCZENIU STYCZEN MOŻE MIEĆ Q4
             values_df = df if values_df is None else pd.merge(values_df, df, on=['year', 'quarter'], how='outer')
-            print(values_df)
-            print()
-        values_df = values_df.set_index('quarter')
-        safe_correlation_matrix(values_df)
+        values_df = values_df.set_index(['year', 'quarter'])
+        detect_error(values_df)
+        safe_correlation_matrix(values_df, 'quarterly')
 
     for indicator in indicators.correlation_indicators_daily:
         indicator_for_csv_file_name = indicator.replace('/', '')
-        print(indicator)
         values_df = None
         for f in files:
             ticker = f[:f.find('_')]
@@ -109,7 +114,8 @@ def correlation(main_folder_path):
             values_df = df if values_df is None else pd.merge(values_df, df, on='date', how='outer')
         values_df['date'] = pd.to_datetime(values_df['date'])
         values_df = values_df.set_index('date')
-        safe_correlation_matrix(values_df)
+        detect_error(values_df)
+        safe_correlation_matrix(values_df, 'daily')
 
 
 def alerts_calculation(main_folder_path):

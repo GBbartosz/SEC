@@ -66,9 +66,11 @@ class HeatMapArea:
             chart_width = '100vh'
             chart_height = '70vh'
 
+        correlation_indicators = self.indicators.correlation_indicators_daily + self.indicators.correlation_indicators_quarterly
+
         heatmap_layout = html.Div([
             html.Div([
-                html.Div(dash_obj.dd_single(f'dd_indicators{i}', 'Select indicator', self.indicators.all_indicators),
+                html.Div(dash_obj.dd_single(f'dd_indicators{i}', 'Select indicator', correlation_indicators),
                          style={'display': 'inline-block', 'width': '40vh', 'height': '3vh', 'fontSize': '12px'}),
                 html.Div(dash_obj.dd_single(f'dd_periods{i}', 'Select period', self.periods),
                          style={'display': 'inline-block', 'width': '20vh', 'height': '3vh', 'fontSize': '12px'})
