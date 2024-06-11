@@ -10,6 +10,8 @@ class Indicators2:
         # used in dataprocessing
         self.summarizing_indicators = ['Revenue',
                                        'NetIncome']
+        #self.not_summarizing_indicators = ['Revenue',  # quarterly
+        #                                   'NetIncome']  # quarterly
         self.not_summarizing_indicators = []
 
         self.metrics_indicators = ['ttm_ProfitMargin',
@@ -57,7 +59,7 @@ class Indicators2:
                                  'ttm_P/S_5y_avg',
                                  'ttm_PSG_historical_3y',
                                  'ttm_PSG_historical_5y']
-        self.all_indicators = ['Shares'] + self.price + self.ttm_indicators + self.metrics_indicators + self.price_indicators
+        self.all_indicators = ['Shares'] + self.price + self.summarizing_indicators + self.ttm_indicators + self.metrics_indicators + self.price_indicators
         #self.all_indicators = ['shares']
 
         self.alerts = ['Price < 3 year average',

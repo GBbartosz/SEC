@@ -129,8 +129,8 @@ def calculate_metrics_indicators2(metricsdf):
 
     # Net Income
     metricsdf['ttm_NetIncomeGrowth1y'] = calculate_change(metricsdf, 'ttm_NetIncome', 1)
-    metricsdf['ttm_NetIncomeGrowth3y'] = calculate_change(metricsdf, 'ttm_NetIncome', 2)
-    metricsdf['ttm_NetIncomeGrowth5y'] = calculate_change(metricsdf, 'ttm_NetIncome', 3)
+    metricsdf['ttm_NetIncomeGrowth3y'] = calculate_change(metricsdf, 'ttm_NetIncome', 3)
+    metricsdf['ttm_NetIncomeGrowth5y'] = calculate_change(metricsdf, 'ttm_NetIncome', 5)
 
     metricsdf['NetIncomeAAGR3y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3)) / 3 - 1, 2)
     metricsdf['NetIncomeAAGR5y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3) + metricsdf['ttm_NetIncome'].shift(year_window * 3) / metricsdf['ttm_NetIncome'].shift(year_window * 4) + metricsdf['ttm_NetIncome'].shift(year_window * 4) / metricsdf['ttm_NetIncome'].shift(year_window * 5)) / 5 - 1, 2)

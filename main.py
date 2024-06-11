@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     tickers_df = pd.read_excel(f'{main_folder_path}tickers_data.xlsx')
     tickers = tickers_df['ticker'].tolist()
-    #tickers = ['MP']
+    #tickers = ['KER.PA']
 
     # tickers_df.to_excel(f'{main_folder_path}tickers.xlsx')
     #tict = TickerType()

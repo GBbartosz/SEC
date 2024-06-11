@@ -44,7 +44,7 @@ tickers = ['AAPL',
             'WEN',
             'WMT',
             'YUM']
-#tickers = ['HD']
+tickers = ['KER.PA']
 
 pd.reset_option('display.max_rows')
 pd.reset_option('display.max_columns')
