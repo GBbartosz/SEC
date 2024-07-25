@@ -10,6 +10,7 @@ from pagepca import page_pca
 from pagealerts import page_alerts
 from pagevaluation import page_valuation
 from pageupdate import page_update
+from pagemarketshare import page_marketshare
 
 
 def read_files(my_main_folder_path):
@@ -33,5 +34,6 @@ if __name__ == "__main__":
     page_alerts(main_folder_path)
     page_valuation(main_folder_path)
     page_update(main_folder_path)
+    page_marketshare(tickers, main_folder_path)
 
     app.run_server(debug=True)

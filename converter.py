@@ -9,43 +9,6 @@ import pandas as pd
 # run script
 
 
-tickers = ['AAPL',
-            'ADBE',
-            'ALB',
-            'AMZN',
-            'AVGO',
-            'BABA',
-            'BIDU',
-            'CMG',
-            'COST',
-            'CRM',
-            'DELL',
-            'F',
-            'GOOGL',
-            'HD',
-            'HPQ',
-            'JNJ',
-            'KO',
-            'LLY',
-            'MA',
-            'MCD',
-            'META',
-            'MP',
-            'MSFT',
-            'NFLX',
-            'NVDA',
-            'NVO',
-            'PEP',
-            'PYPL',
-            'SBUX',
-            'SHAK',
-            'TSLA',
-            'V',
-            'WEN',
-            'WMT',
-            'YUM']
-tickers = ['KER.PA']
-
 pd.reset_option('display.max_rows')
 pd.reset_option('display.max_columns')
 pd.reset_option('display.width')
@@ -106,15 +69,21 @@ pl_month_quarter_dict = {'sty': 1,
                          'lis': 4,
                          'gru': 4}
 
-for ticker in tickers:
-    print(ticker)
 
-    main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+tickers_df = pd.read_excel(f'{main_folder_path}tickers_data.xlsx')
+
+for ticker in tickers_df['ticker']:
+
     converter_folder_path = f'{main_folder_path}converter\\'
     file_name = f'{ticker}_metrics_raw.csv'
 
-    df = pd.read_csv(f'{converter_folder_path}{file_name}', sep=';')
-    print(df.head())
+    try:
+        df = pd.read_csv(f'{converter_folder_path}{file_name}', sep=';')
+        print(ticker)
+        print(df.head())
+    except FileNotFoundError:
+        continue
 
     for c in df.columns:
         if 'Unnamed' in c:
