@@ -4,7 +4,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html
 from dash.dependencies import Input, Output
-import plotly.io as pio
 import dashboard_objects as dash_obj
 from matplotlib import colors as mcolors
 from app import app
@@ -39,9 +38,9 @@ class MarketShareChart:
             line_colors = [f'rgba{str(tuple([i * 255 for i in mcolors.to_rgba(c)[:-1]] + [1.0]))}' for c in ind_sec_df['color'].to_list()]
             fill_colors = [f'rgba{str(tuple([i * 255 for i in mcolors.to_rgba(c)[:-1]] + [0.5]))}' for c in ind_sec_df['color'].to_list()]
 
+            # creating dataframe with all data from industry/sector
             total_df = pd.DataFrame(columns=['year', 'quarter', self.keeper.indicator])
             nominal_columns = []
-            # creating dataframe with all data from industry/sector
             for tic in tickers_from_industry_sector:
                 tic_df = pd.read_csv(f'{main_folder_path}processed_data\\{tic}_processed.csv')[['year', 'quarter', self.keeper.indicator]]
                 tic_df = tic_df.dropna(how='any', axis=0)
