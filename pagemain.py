@@ -18,6 +18,7 @@ class MainChart:
         self.tickers = keeper.tickers
         self.indicators = keeper.indicators + keeper.indicators2
         self.fig = go.Figure()
+        x_lens = [0]  # length of x-axis
         for ticker in self.tickers:
             df = pd.read_csv(f'{self.processed_folder_path}{ticker}_processed.csv')
 
@@ -26,6 +27,7 @@ class MainChart:
             pm = -1
             for indicator in self.indicators:
                 x = df['date']
+                x_lens.append(len(x))
                 try:
                     y = df[indicator]
                 except KeyError:
@@ -61,8 +63,11 @@ class MainChart:
 
         self.fig.update_traces(connectgaps=True)
         self.fig.update_layout(hovermode='closest',
-                               yaxis2=dict(overlaying='y', side='right')
-                               )
+                               xaxis_type='category',
+                               yaxis2=dict(overlaying='y', side='right'))
+
+        max_x_len = max(x_lens)
+        self.fig.update_xaxes(range=[max_x_len * -0.02, max_x_len * 1.02])
 
 
 def main_page(indicators, tickers, main_folder_path):

@@ -94,7 +94,7 @@ def summarize_quarters_to_ttm_years(indicators, metricsdf):
 #    return metricsdf
 
 
-def calculate_metrics_indicators2(metricsdf):
+def calculate_metrics_indicators2(mdf):
     # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
     def calculate_change(mydf, col_name, years_num):
@@ -110,38 +110,45 @@ def calculate_metrics_indicators2(metricsdf):
 
     year_window = 4
 
-    # Profit Margin
-    metricsdf['ttm_ProfitMargin'] = (metricsdf['ttm_NetIncome'] / metricsdf['ttm_Revenue']).round(4)
+    # Shares
+    mdf['SharesChg1q'] = (mdf['Shares'] / mdf['Shares'].shift(1) - 1).round(4)
+    mdf['SharesChg1y'] = (mdf['Shares'] / mdf['Shares'].shift(year_window * 1) - 1).round(4)
+    mdf['SharesChg3y'] = (mdf['Shares'] / mdf['Shares'].shift(year_window * 3) - 1).round(4)
+    mdf['SharesChg5y'] = (mdf['Shares'] / mdf['Shares'].shift(year_window * 5) - 1).round(4)
 
-    metricsdf['ttm_ProfitMargin3yAvg'] = round(metricsdf['ttm_ProfitMargin'].rolling(window=year_window * 3, min_periods=year_window * 3).mean(), 4)
-    metricsdf['ttm_ProfitMargin5yAvg'] = round(metricsdf['ttm_ProfitMargin'].rolling(window=year_window * 5, min_periods=year_window * 5).mean(), 4)
+    # Profit Margin
+    mdf['ttm_ProfitMargin'] = (mdf['ttm_NetIncome'] / mdf['ttm_Revenue']).round(4)
+
+    mdf['ttm_ProfitMargin3yAvg'] = round(mdf['ttm_ProfitMargin'].rolling(window=year_window * 3, min_periods=year_window * 3).mean(), 4)
+    mdf['ttm_ProfitMargin5yAvg'] = round(mdf['ttm_ProfitMargin'].rolling(window=year_window * 5, min_periods=year_window * 5).mean(), 4)
 
     # Revenue
-    metricsdf['ttm_RevenueGrowth1y'] = round(metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 1) - 1, 2)
-    metricsdf['ttm_RevenueGrowth3y'] = round(metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 3) - 1, 2)
-    metricsdf['ttm_RevenueGrowth5y'] = round(metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 5) - 1, 2)
+    mdf['ttm_RevenueGrowth1y'] = round(mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 1) - 1, 2)
+    mdf['ttm_RevenueGrowth3y'] = round(mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 3) - 1, 2)
+    mdf['ttm_RevenueGrowth5y'] = round(mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 5) - 1, 2)
 
-    metricsdf['RevenueAAGR3y'] = round((metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 1) + metricsdf['ttm_Revenue'].shift(year_window * 1) / metricsdf['ttm_Revenue'].shift(year_window * 2) + metricsdf['ttm_Revenue'].shift(year_window * 2) / metricsdf['ttm_Revenue'].shift(year_window * 3)) / 3 - 1, 2)
-    metricsdf['RevenueAAGR5y'] = round((metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 1) + metricsdf['ttm_Revenue'].shift(year_window * 1) / metricsdf['ttm_Revenue'].shift(year_window * 2) + metricsdf['ttm_Revenue'].shift(year_window * 2) / metricsdf['ttm_Revenue'].shift(year_window * 3) + metricsdf['ttm_Revenue'].shift(year_window * 3) / metricsdf['ttm_Revenue'].shift(year_window * 4) + metricsdf['ttm_Revenue'].shift(year_window * 4) / metricsdf['ttm_Revenue'].shift(year_window * 5)) / 5 - 1, 2)
+    mdf['RevenueAAGR3y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 1) + mdf['ttm_Revenue'].shift(year_window * 1) / mdf['ttm_Revenue'].shift(year_window * 2) + mdf['ttm_Revenue'].shift(year_window * 2) / mdf['ttm_Revenue'].shift(year_window * 3)) / 3 - 1, 2)
+    mdf['RevenueAAGR5y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 1) + mdf['ttm_Revenue'].shift(year_window * 1) / mdf['ttm_Revenue'].shift(year_window * 2) + mdf['ttm_Revenue'].shift(year_window * 2) / mdf['ttm_Revenue'].shift(year_window * 3) + mdf['ttm_Revenue'].shift(year_window * 3) / mdf['ttm_Revenue'].shift(year_window * 4) + mdf['ttm_Revenue'].shift(year_window * 4) / mdf['ttm_Revenue'].shift(year_window * 5)) / 5 - 1, 2)
 
-    metricsdf['RevenueCAGR3y'] = round((metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 3)) ** (1 / 3) - 1, 2)
-    metricsdf['RevenueCAGR5y'] = round((metricsdf['ttm_Revenue'] / metricsdf['ttm_Revenue'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
+    mdf['RevenueCAGR3y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 3)) ** (1 / 3) - 1, 2)
+    mdf['RevenueCAGR5y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 5)) ** (1 / 5) - 1, 2)
 
     # Net Income
-    metricsdf['ttm_NetIncomeGrowth1y'] = calculate_change(metricsdf, 'ttm_NetIncome', 1)
-    metricsdf['ttm_NetIncomeGrowth3y'] = calculate_change(metricsdf, 'ttm_NetIncome', 3)
-    metricsdf['ttm_NetIncomeGrowth5y'] = calculate_change(metricsdf, 'ttm_NetIncome', 5)
+    mdf['ttm_NetIncomeGrowth1y'] = calculate_change(mdf, 'ttm_NetIncome', 1)
+    mdf['ttm_NetIncomeGrowth3y'] = calculate_change(mdf, 'ttm_NetIncome', 3)
+    mdf['ttm_NetIncomeGrowth5y'] = calculate_change(mdf, 'ttm_NetIncome', 5)
 
-    metricsdf['NetIncomeAAGR3y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3)) / 3 - 1, 2)
-    metricsdf['NetIncomeAAGR5y'] = round((metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 1) + metricsdf['ttm_NetIncome'].shift(year_window * 1) / metricsdf['ttm_NetIncome'].shift(year_window * 2) + metricsdf['ttm_NetIncome'].shift(year_window * 2) / metricsdf['ttm_NetIncome'].shift(year_window * 3) + metricsdf['ttm_NetIncome'].shift(year_window * 3) / metricsdf['ttm_NetIncome'].shift(year_window * 4) + metricsdf['ttm_NetIncome'].shift(year_window * 4) / metricsdf['ttm_NetIncome'].shift(year_window * 5)) / 5 - 1, 2)
+    mdf['NetIncomeAAGR3y'] = round((mdf['ttm_NetIncome'] / mdf['ttm_NetIncome'].shift(year_window * 1) + mdf['ttm_NetIncome'].shift(year_window * 1) / mdf['ttm_NetIncome'].shift(year_window * 2) + mdf['ttm_NetIncome'].shift(year_window * 2) / mdf['ttm_NetIncome'].shift(year_window * 3)) / 3 - 1, 2)
+    mdf['NetIncomeAAGR5y'] = round((mdf['ttm_NetIncome'] / mdf['ttm_NetIncome'].shift(year_window * 1) + mdf['ttm_NetIncome'].shift(year_window * 1) / mdf['ttm_NetIncome'].shift(year_window * 2) + mdf['ttm_NetIncome'].shift(year_window * 2) / mdf['ttm_NetIncome'].shift(year_window * 3) + mdf['ttm_NetIncome'].shift(year_window * 3) / mdf['ttm_NetIncome'].shift(year_window * 4) + mdf['ttm_NetIncome'].shift(year_window * 4) / mdf['ttm_NetIncome'].shift(year_window * 5)) / 5 - 1, 2)
 
-    metricsdf['calc_growth_3y'] = (metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 3))
-    metricsdf['calc_growth_3y'] = metricsdf['calc_growth_3y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
-    metricsdf['NetIncomeCAGR3y'] = metricsdf['calc_growth_3y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 3) - 1, 2))
-    metricsdf['calc_growth_5y'] = (metricsdf['ttm_NetIncome'] / metricsdf['ttm_NetIncome'].shift(year_window * 5))
-    metricsdf['calc_growth_5y'] = metricsdf['calc_growth_5y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
-    metricsdf['NetIncomeCAGR5y'] = metricsdf['calc_growth_5y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 5) - 1, 2))
-    return metricsdf
+    mdf['calc_growth_3y'] = (mdf['ttm_NetIncome'] / mdf['ttm_NetIncome'].shift(year_window * 3))
+    mdf['calc_growth_3y'] = mdf['calc_growth_3y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
+    mdf['NetIncomeCAGR3y'] = mdf['calc_growth_3y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 3) - 1, 2))
+    mdf['calc_growth_5y'] = (mdf['ttm_NetIncome'] / mdf['ttm_NetIncome'].shift(year_window * 5))
+    mdf['calc_growth_5y'] = mdf['calc_growth_5y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
+    mdf['NetIncomeCAGR5y'] = mdf['calc_growth_5y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / 5) - 1, 2))
+
+    return mdf
 
 #def create_all_data_df(indicators, base_columns, metricsdf, pricedf, sharesdf):
 #    # joins all tables (price, metrics and shares)
@@ -225,10 +232,15 @@ def calculate_price_indicators2(total_df):
     min_year_window = 248
 
     # Price
-    total_df['PriceChangeDaily'] = round(total_df['close'] / total_df['close'].shift(1) - 1, 2)
-    total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
-    total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
-    total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
+    total_df['PriceChangeDaily'] = round(total_df['close'] / total_df['close'].shift(1) - 1, 4)
+    total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 4)
+    total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 4)
+    total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 4)
+
+    # Current price to avg
+    total_df['price_to_1y_avg_ratio'] = (total_df['close'] / total_df['close_1y_avg'] - 1).round(4)
+    total_df['price_to_3y_avg_ratio'] = (total_df['close'] / total_df['close_3y_avg'] - 1).round(4)
+    total_df['price_to_5y_avg_ratio'] = (total_df['close'] / total_df['close_5y_avg'] - 1).round(4)
 
     # market capitalization
     total_df['market_capitalization'] = round(total_df['Shares'] * total_df['close'], 0)
@@ -244,6 +256,10 @@ def calculate_price_indicators2(total_df):
     total_df['ttm_P/E_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['ttm_P/E_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
+    total_df['ttm_PE_to_1y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_1y_avg'] - 1).round(4)
+    total_df['ttm_PE_to_3y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_3y_avg'] - 1).round(4)
+    total_df['ttm_PE_to_5y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_5y_avg'] - 1).round(4)
+
     # PEG
     total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_P/E'] / (total_df['NetIncomeCAGR3y'] * 100).replace(0, 1), 2)
     total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_P/E'] / (total_df['NetIncomeCAGR5y'] * 100).replace(0, 1), 2)
@@ -254,6 +270,10 @@ def calculate_price_indicators2(total_df):
     total_df['ttm_P/S_1y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
     total_df['ttm_P/S_3y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
     total_df['ttm_P/S_5y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
+
+    total_df['ttm_PS_to_1y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_1y_avg'] - 1).round(4)
+    total_df['ttm_PS_to_3y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_3y_avg'] - 1).round(4)
+    total_df['ttm_PS_to_5y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_5y_avg'] - 1).round(4)
 
     # PSG - PEG for revenue
     total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / (total_df['RevenueCAGR3y'] * 100).replace(0, 1), 2)

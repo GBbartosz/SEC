@@ -14,7 +14,11 @@ class Indicators2:
         #                                   'NetIncome']  # quarterly
         self.not_summarizing_indicators = []
 
-        self.metrics_indicators = ['ttm_ProfitMargin',
+        self.metrics_indicators = ['SharesChg1q',
+                                   'SharesChg1y',
+                                   'SharesChg3y',
+                                   'SharesChg5y',
+                                   'ttm_ProfitMargin',
                                    'ttm_ProfitMargin3yAvg',
                                    'ttm_ProfitMargin5yAvg',
                                    'ttm_RevenueGrowth1y',
@@ -43,6 +47,9 @@ class Indicators2:
                                  'close_1y_avg',
                                  'close_3y_avg',
                                  'close_5y_avg',
+                                 'price_to_1y_avg_ratio',
+                                 'price_to_3y_avg_ratio',
+                                 'price_to_5y_avg_ratio',
                                  'market_capitalization',
                                  'market_capitalization_growth_1y',
                                  'market_capitalization_growth_3y',
@@ -51,12 +58,18 @@ class Indicators2:
                                  'ttm_P/E_1y_avg',
                                  'ttm_P/E_3y_avg',
                                  'ttm_P/E_5y_avg',
+                                 'ttm_PE_to_1y_ratio',
+                                 'ttm_PE_to_3y_ratio',
+                                 'ttm_PE_to_5y_ratio',
                                  'ttm_PEG_historical_3y',
                                  'ttm_PEG_historical_5y',
                                  'ttm_P/S',
                                  'ttm_P/S_1y_avg',
                                  'ttm_P/S_3y_avg',
                                  'ttm_P/S_5y_avg',
+                                 'ttm_PS_to_1y_ratio',
+                                 'ttm_PS_to_3y_ratio',
+                                 'ttm_PS_to_5y_ratio',
                                  'ttm_PSG_historical_3y',
                                  'ttm_PSG_historical_5y']
         self.all_indicators = ['Shares'] + self.price + self.summarizing_indicators + self.ttm_indicators + self.metrics_indicators + self.price_indicators

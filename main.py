@@ -67,5 +67,5 @@ if __name__ == '__main__':
         n += 1
 
     current_data(main_folder_path)
-    #correlation(main_folder_path)
+    correlation(main_folder_path)
     alerts_calculation(main_folder_path)

@@ -36,6 +36,6 @@ if __name__ == "__main__":
     page_valuation(main_folder_path)
     page_update(main_folder_path)
     page_marketshare(tickers, main_folder_path)
-    page_marketview(main_folder_path)
+    #page_marketview(main_folder_path)
 
     app.run_server(debug=True)

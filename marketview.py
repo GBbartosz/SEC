@@ -17,7 +17,7 @@ def page_marketview(main_folder_path):
         industry_df = tickers_df.query('industry == @industry')
         for ticker in industry_df['ticker']:
             ticdf = pd.read_csv(f'{main_folder_path}processed_data\\{ticker}_processed.csv')
-            print(ticdf.head())
+            #print(ticdf.head())
 
 
     sectors = tickers_df['sector'].unique()
