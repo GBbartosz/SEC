@@ -1,7 +1,6 @@
 class Indicators2:
     def __init__(self, currency='USD'):
 
-        # used in downloading data from SEC
         self.summarizing_indicators_to_download = ['Revenue',
                                                    'NetIncome']
         self.not_summarizing_indicators_to_download = []

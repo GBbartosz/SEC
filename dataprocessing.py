@@ -222,7 +222,7 @@ def create_all_data_df2(indicators, base_columns, metricsdf, pricedf):
 #    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / (total_df['Revenue_CAGR_5y'] * 100).replace(0, 1), 2)
 
 #    return total_df
-
+#
 
 def calculate_price_indicators2(total_df):
     # create new indicator and add new indicator's name to obj indicators.price_indicators in file indicators
