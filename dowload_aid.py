@@ -41,7 +41,7 @@ def prepare_string_to_float(x):
     return x
 
 
-def download_data(ticker):
+def download_data(myticker):
     service = Service(executable_path='chromedriver.exe')
     driver = webdriver.Chrome(service=service)
 
@@ -49,13 +49,14 @@ def download_data(ticker):
     main_page_link = 'https://www.macrotrends.net/'
     driver.get(main_page_link)
     input_element = driver.find_element(By.CLASS_NAME, 'js-typeahead')
-    input_element.send_keys(ticker)
+    input_element.send_keys(myticker)
     time.sleep(1)
     input_element.send_keys(Keys.ARROW_DOWN + Keys.ENTER)
 
     # getting links
     revenue_link = driver.current_url
     ticker_link = revenue_link[:-7]
+    time.sleep(0.5)
 
     # scraping revenue data
     data = get_data_from_table(driver)
@@ -64,12 +65,14 @@ def download_data(ticker):
     # scraping net income data
     net_income_link = ticker_link + 'net-income'
     driver.get(net_income_link)
+    time.sleep(0.5)
     data = get_data_from_table(driver)
     net_income_df = prepare_df(data)
 
     # shares outstanding
     shares_outstanding_link = ticker_link + 'shares-outstanding'
     driver.get(shares_outstanding_link)
+    time.sleep(0.5)
     data = get_data_from_table(driver)
     shares_outstanding_df = prepare_df(data)
 
@@ -78,37 +81,57 @@ def download_data(ticker):
     df = df.merge(shares_outstanding_df, on='date', how='inner')
     df.columns = ['date', 'Revenue', 'NetIncome', 'Shares']
     df[['Revenue', 'NetIncome', 'Shares']] = df[['Revenue', 'NetIncome', 'Shares']].map(prepare_string_to_float)
-    df = df.astype({'Revenue': 'float', 'NetIncome': 'float', 'Shares': 'float'})
+    #df = df.astype({'Revenue': 'float', 'NetIncome': 'float', 'Shares': 'float'})
     print(df)
+
+    # Preparing for excel
+    df['end'] = None
+    df['end_period'] = None
+    df['year'] = None
+    df['quarter'] = None
+    df['empty1'] = None
+    df['empty2'] = None
+    df['empty3'] = None
+    df = df[['end', 'end_period', 'year', 'quarter', 'empty1', 'empty2', 'empty3', 'date', 'Revenue', 'NetIncome', 'Shares']]
 
     # saving to csv
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-    raw_data_file_path = f'{main_folder_path}converter\\{ticker}_metrics_raw.csv'
-    df.to_csv(raw_data_file_path, index=False)
+    raw_data_file_path = f'{main_folder_path}converter\\{myticker}_metrics_raw.xlsx'
+    df.to_excel(raw_data_file_path, index=False)
     driver.quit()
     return df
 
 
-def print_results(df):
-    path = 'C:\\Users\\barto\\Desktop\\SEC2024\\converter\\META_metrics_raw.csv'
-    df = pd.read_csv(path)
+def print_results(myticker):
+    path = f'C:\\Users\\barto\\Desktop\\SEC2024\\converter\\{myticker}_metrics_raw.xlsx'
+    df = pd.read_excel(path)
     df['date'] = pd.to_datetime(df['date'])
 
     fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(14, 10))
     i = 0
-    for c in df.columns[1:]:
+    for c in ['Revenue', 'NetIncome', 'Shares']:
         sns.lineplot(data=df, x='date', y=c, marker='o', ax=axs[i])
         i += 1
     plt.show()
 
 
-def download_data_0(ticker):
+def download_data_0(myticker):
     service = Service(executable_path='chromedriver.exe')
     driver = webdriver.Chrome(service=service)
-    investing_link = ''
-    driver.get(investing_link)
+    google_link = 'https://www.investing.com//'
+    driver.get(google_link)
+    time.sleep(7)
+    input_element = driver.find_element(By.CLASS_NAME, 'mainSearch_input-wrapper__hWkM3 ')
+    input_element.send_keys(myticker)
+    time.sleep(1)
+    input_element.send_keys(Keys.ENTER)
+    time.sleep(1)
+    investing_link = driver.find_element(By.CLASS_NAME, 'srp')
+    time.sleep(5)
+    driver.quit()
 
 
-ticker = 'META'
+ticker = 'PM'
 ddf = download_data(ticker)
-print_results(ddf)
+#ddf = download_data_0(ticker)
+print_results(ticker)

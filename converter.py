@@ -25,9 +25,12 @@ def convert_number(x):
     x = str(x)
     if ',' in x:
         x = float(x.replace(',', '.')) * 1000
+    elif '.' in x:
+        x = float(x) * 1000
     else:
         x = float(x)
     return x
+
 
 eng_month_dict = {'Jan': '01',
                   'Feb': '02',
@@ -52,6 +55,8 @@ pl_month_dict = {'sty': 1,
                  'sie': 8,
                  'wrz': 9,
                  'paz': 10,
+                 'paź': 10,
+                 'pa?': 10,
                  'lis': 11,
                  'gru': 12}
 
@@ -65,6 +70,7 @@ pl_month_quarter_dict = {'sty': 1,
                          'sie': 3,
                          'wrz': 3,
                          'paz': 4,
+                         'paź': 4,
                          'pa?': 4,
                          'lis': 4,
                          'gru': 4}
@@ -81,7 +87,7 @@ for ticker in tickers_df['ticker']:
     try:
         df = pd.read_csv(f'{converter_folder_path}{file_name}', sep=';')
         print(ticker)
-        print(df.head())
+        print(df.tail())
     except FileNotFoundError:
         continue
 
@@ -102,7 +108,8 @@ for ticker in tickers_df['ticker']:
     df['quarter'] = df['end_period_month'].map(pl_month_quarter_dict).astype(int)
     df['year'] = ('20' + df['end_period_year']).astype(int)
 
-    #
+    # Indicators
+    df = df.astype({'Revenue': 'string', 'NetIncome': 'string', 'Shares': 'string'})
     df['Revenue'] = df['Revenue'].str.replace('$', '').apply(lambda x: convert_number(x)).round(0)
     df['NetIncome'] = df['NetIncome'].str.replace('$', '').apply(lambda x: convert_number(x)).round(0)
     df['Shares'] = df['Shares'].apply(lambda x: convert_number(x)).round(0)

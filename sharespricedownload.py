@@ -113,7 +113,7 @@ def download_price_and_shares2(ticker, main_folder_path):
 
     # Download shares outstanding data
     stock_info = yf.Ticker(ticker)
-    pricedf = stock_info.history(period='1d', start=min_date, end=datetime.date.today())
+    pricedf = stock_info.history(period='1d', start=min_date, end=datetime.date.today() + datetime.timedelta(days=1))
     pricedf = pricedf.reset_index()
     pricedf = pricedf.rename(columns={'Date': 'date', 'Close': 'close', 'Volumne': 'volume', 'Dividends': 'dividends', 'Stock Splits': 'stock_splits'})
     pricedf = pricedf.drop(columns=['Open', 'High', 'Low'])

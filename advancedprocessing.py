@@ -50,9 +50,9 @@ def correlation(main_folder_path):
                     tic1_min_index = values_df[tic1].dropna().index.min()
                     tic1_max_index = values_df[tic1].dropna().index.max()
                     for tic2 in tickers:
-                        if tic1 != tic2:
-                            tic2_min_index = values_df[tic2].dropna().index.min()
-                            tic2_max_index = values_df[tic2].dropna().index.max()
+                        tic2_min_index = values_df[tic2].dropna().index.min()
+                        tic2_max_index = values_df[tic2].dropna().index.max()
+                        if tic1 != tic2 and isinstance(tic1_min_index, tuple) and isinstance(tic2_min_index, tuple):  # handles nan values
                             min_index = max(tic1_min_index, tic2_min_index)
                             max_index = min(tic1_max_index, tic2_max_index)
                             if period_year == 'all':  # correlation for all available values for both companies not nan

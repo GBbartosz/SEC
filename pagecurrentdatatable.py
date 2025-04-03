@@ -23,6 +23,7 @@ def current_status(main_folder_path):
                 col_width = len_column_content * 6.5 + 50
             return col_width
 
+        mydf = mydf.reset_index(drop=True)
         if column in ['Stock']:
             res = {'field': column, 'pinned': 'left', 'filter': True}
         else:
@@ -46,7 +47,8 @@ def current_status(main_folder_path):
     initial_columns.remove('end')
     keeper = KeeperCurrentStatus()
     keeper.indicators = initial_columns
-    keeper.tickers = current_df['Stock'].to_list()
+    tickers = current_df['Stock'].to_list()
+    keeper.tickers = tickers
 
     layout_current_status_page = html.Div([
         html.Div([dash_obj.navigation_menu(1),
@@ -74,7 +76,8 @@ def current_status(main_folder_path):
         if n_clicks is not None:
             keeper = KeeperCurrentStatus()
             keeper.update_indicators([])
-            keeper.tickers = []
+            keeper.indicators = initial_columns
+            keeper.tickers = tickers
             table = ag_grid_table(current_df)
             return keeper.indicators, keeper.tickers, table
         else:
