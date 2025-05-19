@@ -6,15 +6,13 @@ from functions import pandas_df_display_options
 from indicator2 import Indicators2
 
 
-def current_data(main_folder_path):
-    processed_folder_path = f'{main_folder_path}processed_data\\'
-    current_data_folder = f'{main_folder_path}current_data\\'
-    files = os.listdir(processed_folder_path)
+def current_data(mypaths):
+    files = os.listdir(mypaths.processed_data_folder_path)
 
     current_df = None
     for f in files:
         ticker = f[:f.find('_')]
-        stock_df = pd.read_csv(f'{processed_folder_path}{f}')
+        stock_df = pd.read_csv(f'{mypaths.processed_data_folder_path}{f}')
         stock_series = stock_df.ffill().iloc[-1]
         stock_series = stock_series.rename(ticker)
         if current_df is None:
@@ -30,7 +28,7 @@ def current_data(main_folder_path):
 
     # print(current_df)
 
-    current_df.to_csv(f'{current_data_folder}current_data.csv')
+    current_df.to_csv(f'{mypaths.current_data_folder_path}current_data.csv')
 
 
 def correlation(main_folder_path):
@@ -118,7 +116,7 @@ def correlation(main_folder_path):
         safe_correlation_matrix(values_df, 'daily')
 
 
-def alerts_calculation(main_folder_path):
+def alerts_calculation(mypaths):
     # new alert metrics must be added to Indicators.alerts
 
     def lower_than(series1, series2):
@@ -128,7 +126,7 @@ def alerts_calculation(main_folder_path):
         return 1 if series1 > series2 else np.nan
 
     indicators = Indicators2()
-    df = pd.read_csv(f'{main_folder_path}current_data\\current_data.csv')
+    df = pd.read_csv(f'{mypaths.current_data_folder_path}current_data.csv')
 
     df['Price < 3 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_3y_avg']), axis=1)
     df['Price < 5 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_5y_avg']), axis=1)
@@ -145,11 +143,4 @@ def alerts_calculation(main_folder_path):
     df = df.dropna(thresh=4).reset_index(drop=True)
     df = df.replace(np.nan, 0)
     df = df.sort_values('Total Score', ascending=False)
-    df.to_csv(f'{main_folder_path}current_data\\alerts_data.csv')
-
-
-#pandas_df_display_options()
-#main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
-##current_data(main_folder_path)
-#correlation(main_folder_path)
-#alerts_calculation(main_folder_path)
+    df.to_csv(f'{mypaths.current_data_folder_path}\\alerts_data.csv')

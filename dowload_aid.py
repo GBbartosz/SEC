@@ -2,8 +2,11 @@ import csv
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -41,7 +44,10 @@ def prepare_string_to_float(x):
     return x
 
 
-def download_data(myticker):
+def download_data(myticker, name):
+    options = Options()
+    options.add_argument("--incognito")
+
     service = Service(executable_path='chromedriver.exe')
     driver = webdriver.Chrome(service=service)
 
@@ -49,14 +55,23 @@ def download_data(myticker):
     main_page_link = 'https://www.macrotrends.net/'
     driver.get(main_page_link)
     input_element = driver.find_element(By.CLASS_NAME, 'js-typeahead')
-    input_element.send_keys(myticker)
-    time.sleep(1)
+    input_element.send_keys(name)
+    time.sleep(1.5)
     input_element.send_keys(Keys.ARROW_DOWN + Keys.ENTER)
 
     # getting links
     revenue_link = driver.current_url
     ticker_link = revenue_link[:-7]
     time.sleep(0.5)
+
+    # click accept all button
+    try:
+        accept_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Accept all')]"))
+        )
+        accept_button.click()
+    except Exception as e:
+        print("Accept button not found or couldn't be clicked:", e)
 
     # scraping revenue data
     data = get_data_from_table(driver)
@@ -131,7 +146,23 @@ def download_data_0(myticker):
     driver.quit()
 
 
-ticker = 'PM'
-ddf = download_data(ticker)
+
+#ticker = 'AGRO'
+#name = 'Adecoagro'
+#ddf = download_data(ticker, name)
 #ddf = download_data_0(ticker)
-print_results(ticker)
+#print_results(ticker)
+
+#'AVD': 'American Vanguard',
+#'EBAY': 'eBay',
+#'FNF': 'Fidelity',
+#'HSY': 'Hershey'
+#'KLAC': 'KLA Tencor',
+#'MU': 'Micron',
+stock_dict = {
+
+              }
+for ticker, name in stock_dict.items():
+    print(f'{ticker} - {name}')
+    ddf = download_data(ticker, name)
+

@@ -1,9 +1,5 @@
-from datetime import timedelta
-from dateutil.relativedelta import relativedelta
 import numpy as np
-import os
 import pandas as pd
-import plotly.graph_objects as go
 from indicator2 import Indicators2
 
 
@@ -25,7 +21,7 @@ def calculate_metrics_indicators2(mdf):
         res = np.where(
             shifted_value == 0,
             np.where(current_value > 0, 1, np.where(current_value < 0, -1, 0)),  # if shifted value == 0
-            round(current_value / shifted_value - 1, 2)  # if shifted_value != 0
+            round(current_value / shifted_value - 1, 3)  # if shifted_value != 0
         )
         return res
 
@@ -68,6 +64,7 @@ def calculate_metrics_indicators2(mdf):
     mdf['RevenueCAGR3y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 3)) ** (1 / 3) - 1, 3)
     mdf['RevenueCAGR4y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 4)) ** (1 / 4) - 1, 3)
     mdf['RevenueCAGR5y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 5)) ** (1 / 5) - 1, 3)
+    mdf['RevenueCAGR7y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 7)) ** (1 / 7) - 1, 3)
     mdf['RevenueCAGR10y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 10)) ** (1 / 10) - 1, 3)
 
     # Revenue Future
@@ -94,6 +91,18 @@ def calculate_metrics_indicators2(mdf):
     mdf['Future3yRevenue_on_RevenueCAGR5y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR5y']) ** 3)).round(1)
     mdf['Future4yRevenue_on_RevenueCAGR5y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR5y']) ** 4)).round(1)
     mdf['Future5yRevenue_on_RevenueCAGR5y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR5y']) ** 5)).round(1)
+
+    mdf['Future1yRevenue_on_RevenueCAGR7y'] = (mdf['ttm_Revenue'] * (1 + mdf['RevenueCAGR7y'])).round(1)
+    mdf['Future2yRevenue_on_RevenueCAGR7y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR7y']) ** 2)).round(1)
+    mdf['Future3yRevenue_on_RevenueCAGR7y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR7y']) ** 3)).round(1)
+    mdf['Future4yRevenue_on_RevenueCAGR7y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR7y']) ** 4)).round(1)
+    mdf['Future5yRevenue_on_RevenueCAGR7y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR7y']) ** 5)).round(1)
+
+    mdf['Future1yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * (1 + mdf['RevenueCAGR10y'])).round(1)
+    mdf['Future2yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR10y']) ** 2)).round(1)
+    mdf['Future3yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR10y']) ** 3)).round(1)
+    mdf['Future4yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR10y']) ** 4)).round(1)
+    mdf['Future5yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR10y']) ** 5)).round(1)
 
     # Net Income
     mdf['ttm_NetIncomeGrowth1y'] = calculate_change(mdf, 'ttm_NetIncome', 1)
@@ -260,17 +269,15 @@ def fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, p
     return total_df
 
 
-def process_data2(ticker, main_folder_path):
+def process_data2(ticker, mypaths):
     indicators = Indicators2()
     base_columns = ['date', 'end', 'year', 'quarter', 'Shares', 'close', 'Volume', 'dividends', 'stock_splits']
-    metrics_folder_path = f'{main_folder_path}metrics\\'
-    processed_folder_path = f'{main_folder_path}processed_data\\'
 
     file_name = f'{ticker}_metrics.csv'
-    metricsdf = pd.read_csv(f'{metrics_folder_path}{file_name}')
+    metricsdf = pd.read_csv(f'{mypaths.metrics_folder_path}{file_name}')
     metricsdf['end'] = pd.to_datetime(metricsdf['end'])
 
-    pricedf = pd.read_csv(f'{metrics_folder_path}{ticker}_price.csv')
+    pricedf = pd.read_csv(f'{mypaths.metrics_folder_path}{ticker}_price.csv')
     pricedf['date'] = pd.to_datetime(pricedf['date'])
 
     metricsdf = summarize_quarters_to_ttm_years(indicators, metricsdf)
@@ -279,4 +286,4 @@ def process_data2(ticker, main_folder_path):
     total_df = calculate_price_indicators2(total_df)
     total_df = fill_nan_values_for_metrics(indicators, base_columns, total_df, metricsdf, pricedf)
 
-    total_df.to_csv(f'{processed_folder_path}{ticker}_processed.csv', index=False)
+    total_df.to_csv(f'{mypaths.processed_data_folder_path}{ticker}_processed.csv', index=False)

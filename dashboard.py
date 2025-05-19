@@ -24,7 +24,7 @@ def read_files(my_main_folder_path):
 
 if __name__ == "__main__":
     pandas_df_display_options()
-    main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2024\\'
+    main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2025\\'
     tickers = read_files(main_folder_path)
     indicators = Indicators2()
 
