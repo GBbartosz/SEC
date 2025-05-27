@@ -56,6 +56,8 @@ def calculate_metrics_indicators2(mdf):
     mdf['ttm_RevenueGrowth3y'] = round(mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 3) - 1, 3)
     mdf['ttm_RevenueGrowth5y'] = round(mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 5) - 1, 3)
 
+    mdf['qq_RevenueGrowth'] = round(mdf['Revenue'] / mdf['Revenue'].shift(year_window) - 1, 3)
+
     mdf['RevenueAAGR3y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 1) + mdf['ttm_Revenue'].shift(year_window * 1) / mdf['ttm_Revenue'].shift(year_window * 2) + mdf['ttm_Revenue'].shift(year_window * 2) / mdf['ttm_Revenue'].shift(year_window * 3)) / 3 - 1, 3)
     mdf['RevenueAAGR5y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 1) + mdf['ttm_Revenue'].shift(year_window * 1) / mdf['ttm_Revenue'].shift(year_window * 2) + mdf['ttm_Revenue'].shift(year_window * 2) / mdf['ttm_Revenue'].shift(year_window * 3) + mdf['ttm_Revenue'].shift(year_window * 3) / mdf['ttm_Revenue'].shift(year_window * 4) + mdf['ttm_Revenue'].shift(year_window * 4) / mdf['ttm_Revenue'].shift(year_window * 5)) / 5 - 1, 3)
 
@@ -64,7 +66,9 @@ def calculate_metrics_indicators2(mdf):
     mdf['RevenueCAGR3y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 3)) ** (1 / 3) - 1, 3)
     mdf['RevenueCAGR4y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 4)) ** (1 / 4) - 1, 3)
     mdf['RevenueCAGR5y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 5)) ** (1 / 5) - 1, 3)
+    mdf['RevenueCAGR6y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 6)) ** (1 / 6) - 1, 3)
     mdf['RevenueCAGR7y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 7)) ** (1 / 7) - 1, 3)
+    mdf['RevenueCAGR9y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 9)) ** (1 / 9) - 1, 3)
     mdf['RevenueCAGR10y'] = round((mdf['ttm_Revenue'] / mdf['ttm_Revenue'].shift(year_window * 10)) ** (1 / 10) - 1, 3)
 
     # Revenue Future
@@ -108,6 +112,8 @@ def calculate_metrics_indicators2(mdf):
     mdf['ttm_NetIncomeGrowth1y'] = calculate_change(mdf, 'ttm_NetIncome', 1)
     mdf['ttm_NetIncomeGrowth3y'] = calculate_change(mdf, 'ttm_NetIncome', 3)
     mdf['ttm_NetIncomeGrowth5y'] = calculate_change(mdf, 'ttm_NetIncome', 5)
+
+    mdf['qq_NetIncomeGrowth'] = calculate_change(mdf, 'NetIncome', 1)
 
     # Net Income historical average
     mdf['ttm_NetIncome_3y_mean'] = mdf['NetIncome'].rolling(window=year_window * 3, min_periods=year_window * 3).sum() / 3
@@ -170,13 +176,22 @@ def create_all_data_df2(indicators, base_columns, metricsdf, pricedf):
 def calculate_price_indicators2(total_df):
     # create new indicator and add new indicator's name to obj indicators.price_indicators in file indicators
 
+    total_df.index = total_df['date']  # necessary date index for timedelta in rolling window
+
     # Average window data
     year_window = 252
     min_year_window = 248
+    window_1y_start = total_df[total_df['ttm_Revenue'].notna()].index.min()
+    window_2y_start = total_df[total_df['ttm_RevenueGrowth1y'].notna()].index.min()
+    window_3y_start = total_df[total_df['RevenueCAGR2y'].notna()].index.min()
+    window_5y_start = total_df[total_df['RevenueCAGR4y'].notna()].index.min()
+    window_7y_start = total_df[total_df['RevenueCAGR6y'].notna()].index.min()
+    window_10y_start = total_df[total_df['RevenueCAGR9y'].notna()].index.min()
 
     # Price
     total_df['PriceChangeDaily'] = round(total_df['close'] / total_df['close'].shift(1) - 1, 4)
-    total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 4)
+    total_df['close_1y_avg'] = total_df['close'].rolling(window=pd.Timedelta(days=365)).mean().round(4).where(total_df.index >= window_1y_start)
+    #total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 4)
     total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 4)
     total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 4)
 
@@ -254,6 +269,7 @@ def calculate_price_indicators2(total_df):
     total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / (total_df['RevenueCAGR3y'] * 100).replace(0, 1), 2)
     total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / (total_df['RevenueCAGR5y'] * 100).replace(0, 1), 2)
 
+    total_df = total_df.reset_index(drop=True)  # returning to numerical index from date
     return total_df
 
 

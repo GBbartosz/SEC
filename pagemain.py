@@ -54,9 +54,9 @@ class MainChart:
                                               x=x,
                                               y=y,
                                               mode=mode,
+                                              opacity=0.5,
                                               line=dict(dash=plotly_lines[line_idx], color=color),
                                               marker=dict(symbol=plotly_markers[marker_idx], color=color, size=8),
-                                              opacity=0.7,
                                               hovertemplate='(%{x}, %{y:.3f})',
                                               yaxis=yaxis
                                               )
