@@ -74,7 +74,7 @@ plotly_markers = ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up', 't
 
 def color_generator(ticker):
 
-    ticker_color_df = pd.read_excel('C:\\Users\\barto\\Desktop\\SEC2024\\tickers_data.xlsx')[['ticker', 'color']]
+    ticker_color_df = pd.read_excel('C:\\Users\\barto\\Desktop\\SEC2025\\tickers_data.xlsx')[['ticker', 'color']]
     ticker_color_dict = ticker_color_df.set_index('ticker')['color'].to_dict()
 
     if ticker in ticker_color_dict.keys():

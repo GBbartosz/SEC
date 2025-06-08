@@ -19,19 +19,29 @@ def check_validity_of_data(main_folder_path):
     return current_df
 
 
-def create_update_table(current_df):
+def create_update_table(main_folder_path, current_df):
 
-    color_df = current_df[['Stock', 'last_update', 'updated']].copy()
-    color_df.loc[:, ['Stock', 'last_update']] = 'snow'
+    update_df = current_df[['Stock', 'last_update', 'updated']].reset_index(drop=True)
+    tickers_df = pd.read_excel(f'{main_folder_path}tickers_data.xlsx')
+    update_df = update_df.merge(tickers_df, left_on='Stock', right_on='ticker')
+    color_df = update_df[['Stock', 'company_name', 'sector', 'industry', 'last_update', 'updated']].copy()
+    color_df.loc[:, ['Stock', 'company_name', 'sector', 'industry', 'last_update']] = 'snow'
     color_df['updated'] = color_df['updated'].astype(str).apply(lambda x: 'lightgreen' if x == '1' else 'pink')
 
     fig = go.Figure(go.Table(
-        header=dict(values=list(['Stock', 'Last Update', 'Updated']),
+        header=dict(values=list(['Stock', 'Name', 'Sector', 'Industry', 'Last Update', 'Updated']),
                     align='center',
                     fill_color='#8763EE',
-                    font=dict(color='snow')),
-        cells=dict(values=current_df[['Stock', 'last_update', 'updated']].T,
-                   fill_color=color_df.T)
+                    font=dict(color='snow'),
+                    line_color='darkslategray',
+                    line_width=1
+                    ),
+        cells=dict(values=update_df[['Stock', 'company_name', 'sector', 'industry', 'last_update', 'updated']].T,
+                   fill_color=color_df.T,
+                   line_color='darkslategray',
+                   line_width=1
+                   ),
+        columnwidth=[100, 300, 300, 500, 100, 100]
     ))
     return fig
 
@@ -39,12 +49,12 @@ def create_update_table(current_df):
 def page_update(main_folder_path):
 
     current_df = check_validity_of_data(main_folder_path)
-    updatetable_fig = create_update_table(current_df)
+    updatetable_fig = create_update_table(main_folder_path, current_df)
 
     page_layout = html.Div([
         html.Div(dash_obj.navigation_menu(6)),
         html.Div([
-            dcc.Graph(id='UpdateTable', figure=updatetable_fig, style={'width': '450px', 'height': '800px'})
+            dcc.Graph(id='UpdateTable', figure=updatetable_fig, style={'width': '1400px', 'height': '800px'})
         ])
     ])
 

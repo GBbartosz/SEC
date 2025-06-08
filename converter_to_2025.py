@@ -68,3 +68,4 @@ for file in files:
         df[col] = df[col].apply(format_numbers)
 
     df.to_csv(path, index=False)
+    print()
