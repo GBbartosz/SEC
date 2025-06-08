@@ -1,5 +1,7 @@
 import os
 
+import pandas as pd
+
 from app import app
 from functions import pandas_df_display_options
 from indicator2 import Indicators2
@@ -12,6 +14,7 @@ from pagevaluation import page_valuation
 from pageupdate import page_update
 from pagemarketshare import page_marketshare
 from marketview import page_marketview
+from pagepricechange import page_pricechange
 
 
 def read_files(my_main_folder_path):
@@ -26,6 +29,7 @@ if __name__ == "__main__":
     pandas_df_display_options()
     main_folder_path = 'C:\\Users\\barto\\Desktop\\SEC2025\\'
     tickers = read_files(main_folder_path)
+    tickers_df = pd.read_excel(f'{main_folder_path}\\tickers_data.xlsx')
     indicators = Indicators2()
 
     main_page(indicators, tickers, main_folder_path)
@@ -37,5 +41,6 @@ if __name__ == "__main__":
     page_update(main_folder_path)
     page_marketshare(tickers, main_folder_path)
     #page_marketview(main_folder_path)
+    page_pricechange(tickers_df, main_folder_path)
 
     app.run_server(debug=True)

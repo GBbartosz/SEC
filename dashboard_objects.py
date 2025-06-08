@@ -44,7 +44,7 @@ def page_link(obj_id, name, path, disabled=False):
 
 
 def navigation_menu(disabled_position):
-    clicable_elements = [False for e in list(range(9))]
+    clicable_elements = [False for e in list(range(10))]
     clicable_elements[disabled_position] = True
     page_link_html_style = {'display': 'inline-block', 'marginLeft': '10px'}
     nm = html.Div([
@@ -56,6 +56,7 @@ def navigation_menu(disabled_position):
         html.Div(page_link('ValuationLink', 'Valuation', '/valuation', disabled=clicable_elements[5]), style=page_link_html_style),
         html.Div(page_link('UpdateLink', 'Update', '/update', disabled=clicable_elements[6]), style=page_link_html_style),
         html.Div(page_link('MarketShareLink', 'Market Share', '/marketshare', disabled=clicable_elements[7]), style=page_link_html_style),
-        html.Div(page_link('MarketViewLink', 'Market View', '/marketview', disabled=clicable_elements[8]), style=page_link_html_style)
+        html.Div(page_link('MarketViewLink', 'Market View', '/marketview', disabled=clicable_elements[8]), style=page_link_html_style),
+        html.Div(page_link('PriceChangeLink', 'Price Change', '/pricechange', disabled=clicable_elements[9]), style=page_link_html_style)
         ], style={'height': '4vh', 'display': 'inline-block', 'textAlign': 'left', 'alignItems': 'center'})
     return nm
