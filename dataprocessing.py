@@ -14,21 +14,23 @@ def summarize_quarters_to_ttm_years(indicators, metricsdf):
 def calculate_metrics_indicators2(mdf):
     # create new indicator and add new indicator's name to obj indicators.metrics_indicators in file indicators
 
-    def calculate_change(mydf, col_name, years_num):
-        shifted_value = mydf[col_name].shift(year_window * years_num)
-        current_value = mydf[col_name]
+    def calculate_change(current, previous):
+        if previous == 0:
+            if current > 0:
+                return 1
+            elif current < 0:
+                return -1
+            else:
+                return 0  # or np.nan, or custom value
+        return ((current - previous) / abs(previous)).round(4)
 
-        res = np.where(
-            shifted_value == 0,
-            np.where(current_value > 0, 1, np.where(current_value < 0, -1, 0)),  # if shifted value == 0
-            round(current_value / shifted_value - 1, 3)  # if shifted_value != 0
-        )
-        return res
 
     def calculate_net_income_cagr(mydf, years_num):
-        mdf[f'calc_growth_{years_num}y'] = (mdf['ttm_NetIncome'] / mdf['ttm_NetIncome'].shift(year_window * years_num))
-        mdf[f'calc_growth_{years_num}y'] = mdf[f'calc_growth_{years_num}y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
-        mdf[f'NetIncomeCAGR{years_num}y'] = mdf[f'calc_growth_{years_num}y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / years_num) - 1, 3))
+        mydf[f'calc_growth_{years_num}y'] = mydf['ttm_NetIncome'] / mydf['ttm_NetIncome'].shift(year_window * years_num)
+        mydf.loc[(mydf['ttm_NetIncome'] <= 0) | (mydf['ttm_NetIncome'].shift(year_window * years_num) <= 0), f'calc_growth_{years_num}y'] = np.nan
+        mydf[f'NetIncomeCAGR{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: round((x ** (1 / years_num) - 1), 3) if pd.notnull(x) and x > 0 else None)
+        #mydf[f'calc_growth_{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
+        #mydf[f'NetIncomeCAGR{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / years_num) - 1, 3))
         return mydf
 
     year_window = 4
@@ -42,11 +44,16 @@ def calculate_metrics_indicators2(mdf):
     # Profit Margin
     mdf['ttm_ProfitMargin'] = (mdf['ttm_NetIncome'] / mdf['ttm_Revenue']).round(4)
 
-    mdf['ttm_ProfitMarginChg1y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 1) - 1).round(4)
-    mdf['ttm_ProfitMarginChg2y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 2) - 1).round(4)
-    mdf['ttm_ProfitMarginChg3y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 3) - 1).round(4)
-    mdf['ttm_ProfitMarginChg4y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 4) - 1).round(4)
-    mdf['ttm_ProfitMarginChg5y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 5) - 1).round(4)
+    #mdf['ttm_ProfitMarginChg1y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 1) - 1).round(4)
+    #mdf['ttm_ProfitMarginChg2y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 2) - 1).round(4)
+    #mdf['ttm_ProfitMarginChg3y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 3) - 1).round(4)
+    #mdf['ttm_ProfitMarginChg4y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 4) - 1).round(4)
+    #mdf['ttm_ProfitMarginChg5y'] = (mdf['ttm_ProfitMargin'] / mdf['ttm_ProfitMargin'].shift(year_window * 5) - 1).round(4)
+    mdf['ttm_ProfitMarginChg1y'] = mdf.apply(lambda row: calculate_change(row['ttm_ProfitMargin'], mdf['ttm_ProfitMargin'].shift(year_window * 1).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_ProfitMarginChg2y'] = mdf.apply(lambda row: calculate_change(row['ttm_ProfitMargin'], mdf['ttm_ProfitMargin'].shift(year_window * 2).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_ProfitMarginChg3y'] = mdf.apply(lambda row: calculate_change(row['ttm_ProfitMargin'], mdf['ttm_ProfitMargin'].shift(year_window * 3).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_ProfitMarginChg4y'] = mdf.apply(lambda row: calculate_change(row['ttm_ProfitMargin'], mdf['ttm_ProfitMargin'].shift(year_window * 4).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_ProfitMarginChg5y'] = mdf.apply(lambda row: calculate_change(row['ttm_ProfitMargin'], mdf['ttm_ProfitMargin'].shift(year_window * 5).loc[row.name]) if row.name > 0 else None, axis=1)
 
     mdf['ttm_ProfitMargin3yAvg'] = round(mdf['ttm_ProfitMargin'].rolling(window=year_window * 3, min_periods=year_window * 3).mean(), 4)
     mdf['ttm_ProfitMargin5yAvg'] = round(mdf['ttm_ProfitMargin'].rolling(window=year_window * 5, min_periods=year_window * 5).mean(), 4)
@@ -109,11 +116,15 @@ def calculate_metrics_indicators2(mdf):
     mdf['Future5yRevenue_on_RevenueCAGR10y'] = (mdf['ttm_Revenue'] * ((1 + mdf['RevenueCAGR10y']) ** 5)).round(1)
 
     # Net Income
-    mdf['ttm_NetIncomeGrowth1y'] = calculate_change(mdf, 'ttm_NetIncome', 1)
-    mdf['ttm_NetIncomeGrowth3y'] = calculate_change(mdf, 'ttm_NetIncome', 3)
-    mdf['ttm_NetIncomeGrowth5y'] = calculate_change(mdf, 'ttm_NetIncome', 5)
+    #mdf['ttm_NetIncomeGrowth1y'] = calculate_change(mdf, 'ttm_NetIncome', 1)
+    #mdf['ttm_NetIncomeGrowth3y'] = calculate_change(mdf, 'ttm_NetIncome', 3)
+    #mdf['ttm_NetIncomeGrowth5y'] = calculate_change(mdf, 'ttm_NetIncome', 5)
+    mdf['ttm_NetIncomeGrowth1y'] = mdf.apply(lambda row: calculate_change(row['ttm_NetIncome'], mdf['ttm_NetIncome'].shift(year_window * 1).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_NetIncomeGrowth3y'] = mdf.apply(lambda row: calculate_change(row['ttm_NetIncome'], mdf['ttm_NetIncome'].shift(year_window * 3).loc[row.name]) if row.name > 0 else None, axis=1)
+    mdf['ttm_NetIncomeGrowth5y'] = mdf.apply(lambda row: calculate_change(row['ttm_NetIncome'], mdf['ttm_NetIncome'].shift(year_window * 5).loc[row.name]) if row.name > 0 else None, axis=1)
 
-    mdf['qq_NetIncomeGrowth'] = calculate_change(mdf, 'NetIncome', 1)
+    #mdf['qq_NetIncomeGrowth'] = calculate_change(mdf, 'NetIncome', 1)
+    mdf['qq_NetIncomeGrowth'] = mdf.apply(lambda row: calculate_change(row['NetIncome'], mdf['NetIncome'].shift(year_window * 1).loc[row.name]) if row.name > 0 else None, axis=1)
 
     # Net Income historical average
     mdf['ttm_NetIncome_3y_mean'] = mdf['NetIncome'].rolling(window=year_window * 3, min_periods=year_window * 3).sum() / 3
@@ -180,6 +191,7 @@ def calculate_price_indicators2(total_df):
 
     # Average window data
     year_window = 252
+    yw = 365
     min_year_window = 248
     window_1y_start = total_df[total_df['ttm_Revenue'].notna()].index.min()
     window_2y_start = total_df[total_df['ttm_RevenueGrowth1y'].notna()].index.min()
@@ -190,10 +202,12 @@ def calculate_price_indicators2(total_df):
 
     # Price
     total_df['PriceChangeDaily'] = round(total_df['close'] / total_df['close'].shift(1) - 1, 4)
-    total_df['close_1y_avg'] = total_df['close'].rolling(window=pd.Timedelta(days=365)).mean().round(4).where(total_df.index >= window_1y_start)
+    total_df['close_1y_avg'] = total_df['close'].rolling(window=pd.Timedelta(days=yw * 1)).mean().round(4).where(total_df.index >= window_1y_start)
+    total_df['close_3y_avg'] = total_df['close'].rolling(window=pd.Timedelta(days=yw * 3)).mean().round(4).where(total_df.index >= window_3y_start)
+    total_df['close_5y_avg'] = total_df['close'].rolling(window=pd.Timedelta(days=yw * 5)).mean().round(4).where(total_df.index >= window_5y_start)
     #total_df['close_1y_avg'] = round(total_df['close'].rolling(window=year_window, min_periods=min_year_window).mean(), 4)
-    total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 4)
-    total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 4)
+    #total_df['close_3y_avg'] = round(total_df['close'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 4)
+    #total_df['close_5y_avg'] = round(total_df['close'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 4)
 
     # Current price to avg
     total_df['price_to_1y_avg_ratio'] = (total_df['close'] / total_df['close_1y_avg'] - 1).round(4)
@@ -208,66 +222,72 @@ def calculate_price_indicators2(total_df):
     total_df['market_capitalization_growth_5y'] = round(total_df['market_capitalization'] / total_df['market_capitalization'].shift(year_window * 5) - 1, 2)
 
     # P/E
-    total_df['ttm_P/E'] = np.where(total_df['ttm_NetIncome'].isna(),  # before first full year available data
-                                   np.nan,
-                                   np.where(total_df['ttm_NetIncome'] > 0,  # Negative Income
-                                            round(total_df['market_capitalization'] / total_df['ttm_NetIncome'], 2),
-                                            0)
-                                   )
+    total_df['ttm_PE'] = np.where(total_df['ttm_NetIncome'].isna(),  # before first full year available data
+                                  np.nan,
+                                  np.where(total_df['ttm_NetIncome'] > 0,  # Negative Income
+                                           round(total_df['market_capitalization'] / total_df['ttm_NetIncome'], 2),
+                                           0)
+                                  )
 
-    total_df['ttm_P/E_1y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
-    total_df['ttm_P/E_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
-    total_df['ttm_P/E_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
+    total_df['ttm_PE_1y_avg'] = total_df['ttm_PE'].rolling(window=pd.Timedelta(days=yw * 1)).mean().round(4).where(total_df.index >= window_1y_start)
+    total_df['ttm_PE_3y_avg'] = total_df['ttm_PE'].rolling(window=pd.Timedelta(days=yw * 3)).mean().round(4).where(total_df.index >= window_3y_start)
+    total_df['ttm_PE_5y_avg'] = total_df['ttm_PE'].rolling(window=pd.Timedelta(days=yw * 5)).mean().round(4).where(total_df.index >= window_5y_start)
+    #total_df['ttm_PE_1y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
+    #total_df['ttm_PE_3y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
+    #total_df['ttm_PE_5y_avg'] = round(total_df['ttm_P/E'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
-    total_df['ttm_PE_to_1y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_1y_avg'] - 1).round(4)
-    total_df['ttm_PE_to_3y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_3y_avg'] - 1).round(4)
-    total_df['ttm_PE_to_5y_ratio'] = (total_df['ttm_P/E'] / total_df['ttm_P/E_5y_avg'] - 1).round(4)
+    total_df['ttm_PE_to_1y_ratio'] = (total_df['ttm_PE'] / total_df['ttm_PE_1y_avg'] - 1).round(4)
+    total_df['ttm_PE_to_3y_ratio'] = (total_df['ttm_PE'] / total_df['ttm_PE_3y_avg'] - 1).round(4)
+    total_df['ttm_PE_to_5y_ratio'] = (total_df['ttm_PE'] / total_df['ttm_PE_5y_avg'] - 1).round(4)
 
     # P/E to historical mean net income
-    total_df['ttm_P/E_3y_earnings'] = np.where(total_df['ttm_NetIncome_3y_mean'].isna(),
+    total_df['ttm_PE_3y_earnings'] = np.where(total_df['ttm_NetIncome_3y_mean'].isna(),
+                                              np.nan,
+                                              np.where(total_df['ttm_NetIncome_3y_mean'] > 0,  # Negative Income
+                                                       round(total_df['market_capitalization'] / total_df['ttm_NetIncome_3y_mean'], 4),
+                                                       0))
+    total_df['ttm_PE_5y_earnings'] = np.where(total_df['ttm_NetIncome_5y_mean'].isna(),
+                                              np.nan,
+                                              np.where(total_df['ttm_NetIncome_5y_mean'] > 0,  # Negative Income
+                                                       round(total_df['market_capitalization'] / total_df['ttm_NetIncome_5y_mean'], 4),
+                                                       0))
+    total_df['ttm_PE_7y_earnings'] = np.where(total_df['ttm_NetIncome_7y_mean'].isna(),
+                                              np.nan,
+                                              np.where(total_df['ttm_NetIncome_7y_mean'] > 0,  # Negative Income
+                                                       round(total_df['market_capitalization'] / total_df['ttm_NetIncome_7y_mean'], 4),
+                                                       0))
+    total_df['ttm_PE_10y_earnings'] = np.where(total_df['ttm_NetIncome_10y_mean'].isna(),
                                                np.nan,
-                                               np.where(total_df['ttm_NetIncome_3y_mean'] > 0,  # Negative Income
-                                                        round(total_df['market_capitalization'] / total_df['ttm_NetIncome_3y_mean'], 4),
+                                               np.where(total_df['ttm_NetIncome_10y_mean'] > 0,  # Negative Income
+                                                        round(total_df['market_capitalization'] / total_df['ttm_NetIncome_10y_mean'], 4),
                                                         0))
-    total_df['ttm_P/E_5y_earnings'] = np.where(total_df['ttm_NetIncome_5y_mean'].isna(),
-                                               np.nan,
-                                               np.where(total_df['ttm_NetIncome_5y_mean'] > 0,  # Negative Income
-                                                        round(total_df['market_capitalization'] / total_df['ttm_NetIncome_5y_mean'], 4),
-                                                        0))
-    total_df['ttm_P/E_7y_earnings'] = np.where(total_df['ttm_NetIncome_7y_mean'].isna(),
-                                               np.nan,
-                                               np.where(total_df['ttm_NetIncome_7y_mean'] > 0,  # Negative Income
-                                                        round(total_df['market_capitalization'] / total_df['ttm_NetIncome_7y_mean'], 4),
-                                                        0))
-    total_df['ttm_P/E_10y_earnings'] = np.where(total_df['ttm_NetIncome_10y_mean'].isna(),
-                                                np.nan,
-                                                np.where(total_df['ttm_NetIncome_10y_mean'] > 0,  # Negative Income
-                                                         round(total_df['market_capitalization'] / total_df['ttm_NetIncome_10y_mean'], 4),
-                                                         0))
 
     # PEG
-    total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_P/E'] / (total_df['NetIncomeCAGR3y'] * 100).replace(0, 1), 2)
-    total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_P/E'] / (total_df['NetIncomeCAGR5y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PEG_historical_3y'] = round(total_df['ttm_PE'] / (total_df['NetIncomeCAGR3y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PEG_historical_5y'] = round(total_df['ttm_PE'] / (total_df['NetIncomeCAGR5y'] * 100).replace(0, 1), 2)
 
     # P/S
-    total_df['ttm_P/S'] = np.where(total_df['ttm_Revenue'].isna(),  # before first full year available data
-                                   np.nan,
-                                   np.where(total_df['ttm_Revenue'] > 0,  # Negative Revenue
-                                            round(total_df['market_capitalization'] / total_df['ttm_Revenue'], 2),
-                                            0)
-                                   )
+    total_df['ttm_PS'] = np.where(total_df['ttm_Revenue'].isna(),  # before first full year available data
+                                  np.nan,
+                                  np.where(total_df['ttm_Revenue'] > 0,  # Negative Revenue
+                                           round(total_df['market_capitalization'] / total_df['ttm_Revenue'], 2),
+                                           0)
+                                  )
 
-    total_df['ttm_P/S_1y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
-    total_df['ttm_P/S_3y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
-    total_df['ttm_P/S_5y_avg'] = round(total_df['ttm_P/S'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
+    total_df['ttm_PS_1y_avg'] = total_df['ttm_PS'].rolling(window=pd.Timedelta(days=yw * 1)).mean().round(4).where(total_df.index >= window_1y_start)
+    total_df['ttm_PS_3y_avg'] = total_df['ttm_PS'].rolling(window=pd.Timedelta(days=yw * 3)).mean().round(4).where(total_df.index >= window_3y_start)
+    total_df['ttm_PS_5y_avg'] = total_df['ttm_PS'].rolling(window=pd.Timedelta(days=yw * 5)).mean().round(4).where(total_df.index >= window_5y_start)
+    # total_df['ttm_PS_1y_avg'] = round(total_df['ttm_PS'].rolling(window=year_window, min_periods=min_year_window).mean(), 2)
+    # total_df['ttm_PS_3y_avg'] = round(total_df['ttm_PS'].rolling(window=year_window * 3, min_periods=min_year_window * 3).mean(), 2)
+    # total_df['ttm_PS_5y_avg'] = round(total_df['ttm_PS'].rolling(window=year_window * 5, min_periods=min_year_window * 5).mean(), 2)
 
-    total_df['ttm_PS_to_1y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_1y_avg'] - 1).round(4)
-    total_df['ttm_PS_to_3y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_3y_avg'] - 1).round(4)
-    total_df['ttm_PS_to_5y_ratio'] = (total_df['ttm_P/S'] / total_df['ttm_P/S_5y_avg'] - 1).round(4)
+    total_df['ttm_PS_to_1y_ratio'] = (total_df['ttm_PS'] / total_df['ttm_PS_1y_avg'] - 1).round(4)
+    total_df['ttm_PS_to_3y_ratio'] = (total_df['ttm_PS'] / total_df['ttm_PS_3y_avg'] - 1).round(4)
+    total_df['ttm_PS_to_5y_ratio'] = (total_df['ttm_PS'] / total_df['ttm_PS_5y_avg'] - 1).round(4)
 
     # PSG - PEG for revenue
-    total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_P/S'] / (total_df['RevenueCAGR3y'] * 100).replace(0, 1), 2)
-    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_P/S'] / (total_df['RevenueCAGR5y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PSG_historical_3y'] = round(total_df['ttm_PS'] / (total_df['RevenueCAGR3y'] * 100).replace(0, 1), 2)
+    total_df['ttm_PSG_historical_5y'] = round(total_df['ttm_PS'] / (total_df['RevenueCAGR5y'] * 100).replace(0, 1), 2)
 
     total_df = total_df.reset_index(drop=True)  # returning to numerical index from date
     return total_df

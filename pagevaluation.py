@@ -89,7 +89,7 @@ def page_valuation(main_folder_path):
             html.Div(html.H3('Net income growth valuation'), style={'textAlign': 'center'}),
             html.Div([
                 html.Div([
-                    html.Div(html.H5('Predicted P/E'), style={'display': 'inline-block', 'width': input_label_width, 'height': input_height, 'textAlign': 'right', 'marginRight': '1vh'}),
+                    html.Div(html.H5('Predicted PE'), style={'display': 'inline-block', 'width': input_label_width, 'height': input_height, 'textAlign': 'right', 'marginRight': '1vh'}),
                     html.Div(dcc.Input(id='pe_input', type='number', style={'width': '10vh'}), style={'display': 'inline-block', 'width': input_width, 'height': input_height})
                 ], style={'width': '30vh'}),
                 html.Div([
@@ -115,7 +115,7 @@ def page_valuation(main_folder_path):
             html.Div(html.H3('Revenue growth valuation'), style={'textAlign': 'center'}),
             html.Div([
                 html.Div([
-                    html.Div(html.H5('Predicted P/S'), style={'display': 'inline-block', 'width': input_label_width, 'height': input_height, 'textAlign': 'right', 'marginRight': '1vh'}),
+                    html.Div(html.H5('Predicted PS'), style={'display': 'inline-block', 'width': input_label_width, 'height': input_height, 'textAlign': 'right', 'marginRight': '1vh'}),
                     html.Div(dcc.Input(id='ps_input', type='number', style={'width': '10vh'}), style={'display': 'inline-block', 'width': input_width, 'height': input_height})
                 ], style={'width': '30vh'}),
                 html.Div([
@@ -154,9 +154,9 @@ def page_valuation(main_folder_path):
         if value is not None:
             print(value)
             valuation.select_ticker(value)
-            pm_pe_table = valuation.pm_graph_obj(['ttm_P/E', 'ttm_P/E_1y_avg', 'ttm_P/E_3y_avg', 'ttm_P/E_5y_avg'])
+            pm_pe_table = valuation.pm_graph_obj(['ttm_PE', 'ttm_PE_1y_avg', 'ttm_PE_3y_avg', 'ttm_PE_5y_avg'])
             pm_cagr_table = valuation.pm_graph_obj(['NetIncomeCAGR3y', 'NetIncomeCAGR5y'])
-            pm_ps_table = valuation.pm_graph_obj(['ttm_P/S', 'ttm_P/S_1y_avg', 'ttm_P/S_3y_avg', 'ttm_P/S_5y_avg'])
+            pm_ps_table = valuation.pm_graph_obj(['ttm_PS', 'ttm_PS_1y_avg', 'ttm_PS_3y_avg', 'ttm_PS_5y_avg'])
             pm_revenue_cagr_table = valuation.pm_graph_obj(['RevenueCAGR3y', 'RevenueCAGR5y'])
             return valuation.ticker, valuation.df['close'], pm_pe_table, pm_cagr_table, pm_ps_table, pm_revenue_cagr_table
 

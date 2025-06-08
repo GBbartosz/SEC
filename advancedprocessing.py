@@ -132,10 +132,10 @@ def alerts_calculation(mypaths):
     df['Price < 5 year average'] = df.apply(lambda x: lower_than(x['close'], x['close_5y_avg']), axis=1)
     df['ProfitMargin > 3 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin3yAvg']), axis=1)
     df['ProfitMargin > 5 year average'] = df.apply(lambda x: higher_than(x['ttm_ProfitMargin'], x['ttm_ProfitMargin5yAvg']), axis=1)
-    df['P/E < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_3y_avg']), axis=1)
-    df['P/E < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_P/E'], x['ttm_P/E_5y_avg']), axis=1)
-    df['P/S < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_P/S'], x['ttm_P/S_3y_avg']), axis=1)
-    df['P/S < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_P/S'], x['ttm_P/S_5y_avg']), axis=1)
+    df['PE < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_PE'], x['ttm_PE_3y_avg']), axis=1)
+    df['PE < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_PE'], x['ttm_PE_5y_avg']), axis=1)
+    df['PS < 3 year average'] = df.apply(lambda x: lower_than(x['ttm_PS'], x['ttm_PS_3y_avg']), axis=1)
+    df['PS < 5 year average'] = df.apply(lambda x: lower_than(x['ttm_PS'], x['ttm_PS_5y_avg']), axis=1)
 
     df['Total Score'] = df[indicators.alerts].sum(axis=1)
 

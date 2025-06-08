@@ -56,6 +56,8 @@ for file in files:
     print(file)
     path = folder_path + '\\' + file
     df = pd.read_csv(path, sep=';')
+    print(df.head())
+    print(df.info())
 
     df['end'] = pd.to_datetime(df['end'].apply(format_end))
 
