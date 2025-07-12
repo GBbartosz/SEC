@@ -10,7 +10,6 @@ import plotly.graph_objects as go
 
 class Keeper:
     def __init__(self):
-        self.main_folder_path = None
         self.selected_tickers = []
         self.df = None
         self.filtered_data = None
@@ -20,19 +19,16 @@ class Keeper:
         self.scatter_chart_type_y = 'Final Change'
 
 
-def page_pricechange(tickers_df, main_folder_path):
+def page_pricechange(tickers_df, merged_df):
     scatter_dropdown_options = ['Max Drop', 'Max Gain', 'Final Change']
 
     keeper = Keeper()
-    keeper.main_folder_path = main_folder_path
     keeper.tickers_df = tickers_df
 
-    all_tickers_df = None
-    for tic in keeper.tickers_df['ticker']:
-        ticdf = pd.read_csv(f'{main_folder_path}\\processed_data\\{tic}_processed.csv')[['date', 'close']]
-        ticdf = ticdf.rename(columns={'close': tic})
-        all_tickers_df = ticdf if all_tickers_df is None else all_tickers_df.merge(ticdf, on='date', how='inner')
-    all_tickers_df = all_tickers_df.set_index('date')
+    close_columns = [f'{t}_close' for t in keeper.tickers_df['ticker']]
+    all_tickers_df = merged_df.copy()
+    all_tickers_df = all_tickers_df.set_index('date')[close_columns]
+    all_tickers_df.columns = keeper.tickers_df['ticker'].values
     keeper.all_tickers_df = all_tickers_df
 
     page_layout = html.Div([
@@ -68,13 +64,9 @@ def page_pricechange(tickers_df, main_folder_path):
          Output('EndHeatmapChart', 'figure'),
          Output('ScatterChart', 'figure')],
         Input('ticker_dropdown', 'value'),
-         #Input('scatter_dropdown_x', 'value'),
-         #Input('scatter_dropdown_y', 'value')],
         prevent_initial_call=True
     )
     def update_tickers(selected_tickers):#, scatter_x, scatter_y):
-        #keeper.scatter_chart_type_x = scatter_x
-        #keeper.scatter_chart_type_y = scatter_y
         slider_min = 0
 
         if not keeper.scatter_chart_type_x or not keeper.scatter_chart_type_y or not selected_tickers:
@@ -87,19 +79,8 @@ def page_pricechange(tickers_df, main_folder_path):
             sfig = go.Figure()
             return slider_min, slider_max, marks, fig, min_hfig, max_hfig, end_hfig, sfig
 
-        #if not selected_tickers:
-        #    slider_max = 1,
-        #    marks = {}
-        #    fig = go.Figure()
-        #    return slider_min, slider_max, marks, fig
-
         keeper.selected_tickers = selected_tickers
-        df = None
-        for tic in selected_tickers:
-            ticdf = pd.read_csv(f'{main_folder_path}\\processed_data\\{tic}_processed.csv')[['date', 'close']]
-            ticdf = ticdf.rename(columns={'close': tic})
-            df = ticdf if df is None else df.merge(ticdf, on='date', how='inner')
-        df = df.set_index('date')
+        df = keeper.all_tickers_df[selected_tickers].dropna(how='any')
         keeper.df = df
         keeper.filtered_data = df
 
@@ -123,11 +104,8 @@ def page_pricechange(tickers_df, main_folder_path):
          #Input('scatter_dropdown_y', 'value')],
         prevent_initial_call=True
     )
-    def update_slider(date_range):#, scatter_x, scatter_y):
-        #keeper.scatter_chart_type_x = scatter_x
-        #keeper.scatter_chart_type_y = scatter_y
+    def update_slider(date_range):
 
-        #if not scatter_x or not scatter_y or not keeper.selected_tickers or not date_range:
         if not keeper.selected_tickers or not date_range:
             fig = go.Figure()
             min_hfig = go.Figure()
@@ -135,14 +113,6 @@ def page_pricechange(tickers_df, main_folder_path):
             end_hfig = go.Figure()
             sfig = go.Figure()
             return fig, min_hfig, max_hfig, end_hfig, sfig
-
-        #if not keeper.selected_tickers:
-        #    fig = go.Figure()
-        #    return fig
-#
-        #if not date_range:
-        #    fig = price_chart()
-        #    return fig
 
         start_index, end_index = date_range
         filtered_data = keeper.df.iloc[start_index:end_index + 1]
@@ -235,8 +205,6 @@ def page_pricechange(tickers_df, main_folder_path):
         ydf = chart_type_df_dict[keeper.scatter_chart_type_y]
         df = xdf.merge(ydf, how='inner', left_index=True, right_index=True)
         selected_df = df[df.index.isin(keeper.selected_tickers)]
-        df = df.drop(index=keeper.selected_tickers)
-        print(selected_df)
 
         sfig = go.Figure()
         sfig.add_trace(go.Scatter(x=df.iloc[:, 0],

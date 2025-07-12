@@ -28,7 +28,7 @@ def calculate_metrics_indicators2(mdf):
     def calculate_net_income_cagr(mydf, years_num):
         mydf[f'calc_growth_{years_num}y'] = mydf['ttm_NetIncome'] / mydf['ttm_NetIncome'].shift(year_window * years_num)
         mydf.loc[(mydf['ttm_NetIncome'] <= 0) | (mydf['ttm_NetIncome'].shift(year_window * years_num) <= 0), f'calc_growth_{years_num}y'] = np.nan
-        mydf[f'NetIncomeCAGR{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: round((x ** (1 / years_num) - 1), 3) if pd.notnull(x) and x > 0 else 0)
+        mydf[f'NetIncomeCAGR{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: round((x ** (1 / years_num) - 1), 3) if pd.notnull(x) and x > 0 else np.nan)
         #mydf[f'calc_growth_{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: x if x >= 0 or np.isnan(x) else 0.00000001)
         #mydf[f'NetIncomeCAGR{years_num}y'] = mydf[f'calc_growth_{years_num}y'].apply(lambda x: x if x == 0.00000001 or np.isnan(x) else round(x ** (1 / years_num) - 1, 3))
         return mydf
