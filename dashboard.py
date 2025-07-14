@@ -33,12 +33,16 @@ def save_app_data(tickers_df, processed_folder_path, app_data_folder_path, cam_f
     merge_l = []
     for i in tickers_df.index:
         tic = tickers_df.at[i, 'ticker']
+        company_name = tickers_df.at[i, 'company_name']
         sector = tickers_df.at[i, 'sector']
+        industry = tickers_df.at[i, 'industry']
         ticdf = pd.read_csv(f'{processed_folder_path}{tic}_processed.csv')
 
         ticdf_concat = ticdf.copy()[['date', 'end', 'year', 'quarter'] + cam_features.concated.concated_features]
         ticdf_concat['ticker'] = tic
+        ticdf_concat['company_name'] = company_name
         ticdf_concat['sector'] = sector
+        ticdf_concat['industry'] = industry
         concat_l.append(ticdf_concat)
 
         ticdf_merge = ticdf.copy()[['date', 'end', 'year', 'quarter'] + cam_features.merged.merged_features]
@@ -66,8 +70,10 @@ def read_app_date(app_data_folder_path):
 class PageBoardFeatures:
     def __init__(self):
         self.range_features = ['close']
-        self.date_features = ['PriceChangeDaily']
-        self.quarter_features = ['ttm_Revenue', 'ttm_NetIncome']
+        self.date_features = ['PriceChangeDaily', 'ttm_PE', 'ttm_PS', 'ttm_PEG_historical_3y', 'ttm_PEG_historical_5y']
+        self.quarter_features = ['ttm_Revenue', 'qq_RevenueGrowth', 'ttm_RevenueGrowth1y', 'ttm_RevenueGrowth3y', 'ttm_RevenueGrowth5y',
+                                 'ttm_NetIncome', 'qq_NetIncomeGrowth', 'ttm_NetIncomeGrowth1y', 'ttm_NetIncomeGrowth3y', 'ttm_NetIncomeGrowth5y',
+                                 'ttm_ProfitMargin']
 
         self.board_features = self.range_features + self.date_features + self.quarter_features
 
